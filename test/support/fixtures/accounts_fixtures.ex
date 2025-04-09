@@ -5,22 +5,28 @@ defmodule Agora.AccountsFixtures do
   """
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
+  def unique_user_username, do: "user#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
       email: unique_user_email(),
+      username: unique_user_username(),
       password: valid_user_password()
     })
   end
 
   def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> valid_user_attributes()
-      |> Agora.Accounts.register_user()
+    case attrs
+         |> valid_user_attributes()
+         |> Agora.Accounts.register_user() do
+      {:ok, user} ->
+        user
 
-    user
+      {:error, changeset} ->
+        # Raise a more informative error if fixture creation fails
+        raise "Failed to create user fixture. Errors: #{inspect(changeset.errors)}"
+    end
   end
 
   def extract_user_token(fun) do

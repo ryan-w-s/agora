@@ -4,10 +4,17 @@ defmodule Agora.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+
+    # Profile fields
+    field :bio, :string
+    field :profile_picture_url, :string
+    field :signature, :string
+    field :is_moderator, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -37,8 +44,9 @@ defmodule Agora.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username])
     |> validate_email(opts)
+    |> validate_username()
     |> validate_password(opts)
   end
 
@@ -48,6 +56,15 @@ defmodule Agora.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+  end
+
+  defp validate_username(changeset) do
+    changeset
+    |> validate_required([:username])
+    |> validate_length(:username, min: 3, max: 30)
+    |> validate_format(:username, ~r/^[a-zA-Z0-9_]+$/, message: "can only contain letters, numbers, and underscores")
+    |> unsafe_validate_unique(:username, Agora.Repo)
+    |> unique_constraint(:username)
   end
 
   defp validate_password(changeset, opts) do
@@ -84,6 +101,17 @@ defmodule Agora.Accounts.User do
     else
       changeset
     end
+  end
+
+  @doc """
+  A user changeset for updating profile information.
+  """
+  def profile_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:bio, :profile_picture_url, :signature])
+    |> validate_length(:profile_picture_url, max: 2048) # Basic validation for URL length
+    |> validate_length(:bio, max: 5000)
+    |> validate_length(:signature, max: 1000)
   end
 
   @doc """

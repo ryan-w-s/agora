@@ -97,7 +97,7 @@ defmodule Agora.AccountsTest do
   describe "change_user_registration/2" do
     test "returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
-      assert changeset.required == [:password, :email]
+      assert changeset.required == [:password, :username, :email]
     end
 
     test "allows fields to be set" do
@@ -503,6 +503,61 @@ defmodule Agora.AccountsTest do
   describe "inspect/2 for the User module" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
+    end
+  end
+
+  describe "profile_changeset/2" do
+    setup do
+      %{user: user_fixture()}
+    end
+
+    test "allows valid profile fields to be set", %{user: user} do
+      attrs = %{
+        "bio" => "This is my bio.",
+        "profile_picture_url" => "http://example.com/pic.jpg",
+        "signature" => "My signature"
+      }
+
+      changeset = Accounts.User.profile_changeset(user, attrs)
+      assert changeset.valid?
+      assert get_change(changeset, :bio) == attrs["bio"]
+      assert get_change(changeset, :profile_picture_url) == attrs["profile_picture_url"]
+      assert get_change(changeset, :signature) == attrs["signature"]
+    end
+
+    test "validates field lengths", %{user: user} do
+      long_string = String.duplicate("a", 5001)
+      long_url = "http://example.com/" <> String.duplicate("a", 2040)
+      long_signature = String.duplicate("s", 1001)
+
+      attrs = %{
+        "bio" => long_string,
+        "profile_picture_url" => long_url,
+        "signature" => long_signature
+      }
+
+      changeset = Accounts.User.profile_changeset(user, attrs)
+      refute changeset.valid?
+
+      assert errors_on(changeset) == %{
+        bio: ["should be at most 5000 character(s)"],
+        profile_picture_url: ["should be at most 2048 character(s)"],
+        signature: ["should be at most 1000 character(s)"]
+      }
+    end
+
+    test "ignores non-profile fields", %{user: user} do
+      attrs = %{
+        "bio" => "New bio",
+        "email" => "ignored@example.com",
+        "is_moderator" => true
+      }
+
+      changeset = Accounts.User.profile_changeset(user, attrs)
+      assert changeset.valid?
+      assert get_change(changeset, :bio) == attrs["bio"]
+      refute get_change(changeset, :email)
+      refute get_change(changeset, :is_moderator)
     end
   end
 end

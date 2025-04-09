@@ -4,13 +4,19 @@ defmodule Agora.Repo.Migrations.CreateUsersAuthTables do
   def change do
     create table(:users) do
       add :email, :string, null: false, collate: :nocase
+      add :username, :string, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :utc_datetime
+      add :bio, :text
+      add :profile_picture_url, :string
+      add :signature, :text
+      add :is_moderator, :boolean, default: false, null: false
 
       timestamps(type: :utc_datetime)
     end
 
     create unique_index(:users, [:email])
+    create unique_index(:users, [:username])
 
     create table(:users_tokens) do
       add :user_id, references(:users, on_delete: :delete_all), null: false

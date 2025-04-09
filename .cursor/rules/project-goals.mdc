@@ -25,6 +25,7 @@ Modern forum service.
     - Emoji Reactions
 - Users
     - Will use Phoenix's authentication
+    - Public username
     - Profile page with bio and recent activity
     - Profile pictures and signatures
     - Some users can be moderators
