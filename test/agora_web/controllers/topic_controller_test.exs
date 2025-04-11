@@ -29,7 +29,7 @@ defmodule AgoraWeb.TopicControllerTest do
       assert redirected_to(conn) == ~p"/topics/#{id}"
 
       conn = get(conn, ~p"/topics/#{id}")
-      assert html_response(conn, 200) =~ "Topic #{id}"
+      assert html_response(conn, 200) =~ @create_attrs.name
     end
 
     test "renders errors when data is invalid", %{conn: conn} do

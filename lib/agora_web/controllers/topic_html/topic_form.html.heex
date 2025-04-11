@@ -4,7 +4,13 @@
   </.error>
   <.input field={f[:name]} type="text" label="Name" />
   <.input field={f[:description]} type="text" label="Description" />
-  <.input field={f[:parent_topic_id]} type="select" label="Parent Topic" options={Enum.map(@topics, &{&1.name, &1.id})} prompt="-- No Parent Topic --"/>
+  <.input
+    field={f[:parent_topic_id]}
+    type="select"
+    label="Parent Topic"
+    options={Enum.map(@topics, &{&1.name, &1.id})}
+    prompt="-- No Parent Topic --"
+  />
   <:actions>
     <.button>Save Topic</.button>
   </:actions>

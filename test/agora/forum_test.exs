@@ -17,7 +17,7 @@ defmodule Agora.ForumTest do
 
     test "get_topic!/1 returns the topic with given id" do
       topic = topic_fixture()
-      assert Forum.get_topic!(topic.id) == topic
+      assert Forum.get_topic!(topic.id).id == topic.id
     end
 
     test "create_topic/1 with valid data creates a topic" do
@@ -26,6 +26,24 @@ defmodule Agora.ForumTest do
       assert {:ok, %Topic{} = topic} = Forum.create_topic(valid_attrs)
       assert topic.name == "some name"
       assert topic.description == "some description"
+    end
+
+    test "create_topic/1 with parent_topic_id creates a topic with a parent" do
+      parent_topic = topic_fixture()
+
+      valid_attrs = %{
+        name: "Child Topic",
+        description: "Child Desc",
+        parent_topic_id: parent_topic.id
+      }
+
+      assert {:ok, %Topic{} = topic} = Forum.create_topic(valid_attrs)
+      assert topic.name == "Child Topic"
+      assert topic.parent_topic_id == parent_topic.id
+
+      # Verify preload works after creation (fetch needed)
+      fetched_topic = Forum.get_topic!(topic.id)
+      assert fetched_topic.parent_topic.id == parent_topic.id
     end
 
     test "create_topic/1 with invalid data returns error changeset" do
@@ -41,15 +59,40 @@ defmodule Agora.ForumTest do
       assert topic.description == "some updated description"
     end
 
+    test "update_topic/2 can add a parent_topic_id" do
+      parent_topic = topic_fixture()
+      # Initially no parent
+      child_topic = topic_fixture()
+
+      update_attrs = %{parent_topic_id: parent_topic.id}
+
+      assert {:ok, %Topic{} = updated_child} = Forum.update_topic(child_topic, update_attrs)
+      assert updated_child.parent_topic_id == parent_topic.id
+    end
+
+    test "update_topic/2 can remove a parent_topic_id" do
+      parent_topic = topic_fixture()
+      # Create a child that initially has the parent
+      child_topic = topic_fixture(%{parent_topic_id: parent_topic.id})
+
+      update_attrs = %{parent_topic_id: nil}
+
+      assert {:ok, %Topic{} = updated_child} = Forum.update_topic(child_topic, update_attrs)
+      assert updated_child.parent_topic_id == nil
+    end
+
     test "update_topic/2 with invalid data returns error changeset" do
       topic = topic_fixture()
       assert {:error, %Ecto.Changeset{}} = Forum.update_topic(topic, @invalid_attrs)
-      assert topic == Forum.get_topic!(topic.id)
+      topic_after_attempted_update = Forum.get_topic!(topic.id)
+      assert topic.name == topic_after_attempted_update.name
+      assert topic.description == topic_after_attempted_update.description
     end
 
     test "delete_topic/1 deletes the topic" do
       topic = topic_fixture()
-      assert {:ok, %Topic{}} = Forum.delete_topic(topic)
+      topic_to_delete = Forum.get_topic!(topic.id)
+      assert {:ok, %Topic{}} = Forum.delete_topic(topic_to_delete)
       assert_raise Ecto.NoResultsError, fn -> Forum.get_topic!(topic.id) end
     end
 

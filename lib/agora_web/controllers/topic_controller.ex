@@ -23,7 +23,8 @@ defmodule AgoraWeb.TopicController do
         |> redirect(to: ~p"/topics/#{topic}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :new, changeset: changeset)
+        topics = Forum.list_topics()
+        render(conn, :new, changeset: changeset, topics: topics)
     end
   end
 
@@ -49,7 +50,8 @@ defmodule AgoraWeb.TopicController do
         |> redirect(to: ~p"/topics/#{topic}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :edit, topic: topic, changeset: changeset)
+        topics = Forum.list_topics()
+        render(conn, :edit, topic: topic, changeset: changeset, topics: topics)
     end
   end
 

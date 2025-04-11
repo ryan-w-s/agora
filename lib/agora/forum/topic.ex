@@ -20,5 +20,7 @@ defmodule Agora.Forum.Topic do
     topic
     |> cast(attrs, [:name, :description, :parent_topic_id])
     |> validate_required([:name, :description])
+    |> validate_length(:name, min: 1)
+    |> validate_length(:description, min: 1)
   end
 end
