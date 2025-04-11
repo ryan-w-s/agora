@@ -1,4 +1,10 @@
 defmodule Agora.Accounts.UserNotifier do
+  @moduledoc """
+  Handles sending notifications (like emails) related to user account actions.
+
+  Functions here are typically used for delivering confirmation instructions,
+  password reset emails, etc.
+  """
   import Swoosh.Email
 
   alias Agora.Mailer

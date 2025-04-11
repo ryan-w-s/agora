@@ -540,10 +540,10 @@ defmodule Agora.AccountsTest do
       refute changeset.valid?
 
       assert errors_on(changeset) == %{
-        bio: ["should be at most 5000 character(s)"],
-        profile_picture_url: ["should be at most 2048 character(s)"],
-        signature: ["should be at most 1000 character(s)"]
-      }
+               bio: ["should be at most 5000 character(s)"],
+               profile_picture_url: ["should be at most 2048 character(s)"],
+               signature: ["should be at most 1000 character(s)"]
+             }
     end
 
     test "ignores non-profile fields", %{user: user} do

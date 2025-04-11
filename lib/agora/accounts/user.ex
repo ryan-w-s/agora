@@ -1,4 +1,10 @@
 defmodule Agora.Accounts.User do
+  @moduledoc """
+  Defines the Ecto schema for a User.
+
+  Contains fields for authentication (email, username, password) and profile information.
+  Includes changeset functions for validation during registration, profile updates, etc.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -62,7 +68,9 @@ defmodule Agora.Accounts.User do
     changeset
     |> validate_required([:username])
     |> validate_length(:username, min: 3, max: 30)
-    |> validate_format(:username, ~r/^[a-zA-Z0-9_]+$/, message: "can only contain letters, numbers, and underscores")
+    |> validate_format(:username, ~r/^[a-zA-Z0-9_]+$/,
+      message: "can only contain letters, numbers, and underscores"
+    )
     |> unsafe_validate_unique(:username, Agora.Repo)
     |> unique_constraint(:username)
   end
@@ -109,7 +117,8 @@ defmodule Agora.Accounts.User do
   def profile_changeset(user, attrs) do
     user
     |> cast(attrs, [:bio, :profile_picture_url, :signature])
-    |> validate_length(:profile_picture_url, max: 2048) # Basic validation for URL length
+    # Basic validation for URL length
+    |> validate_length(:profile_picture_url, max: 2048)
     |> validate_length(:bio, max: 5000)
     |> validate_length(:signature, max: 1000)
   end

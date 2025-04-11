@@ -5,7 +5,10 @@ defmodule Agora.AccountsFixtures do
   """
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
-  def unique_user_username, do: "user#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
+
+  def unique_user_username,
+    do: "user#{:crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)}"
+
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do

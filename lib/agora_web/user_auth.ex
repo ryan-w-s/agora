@@ -1,4 +1,10 @@
 defmodule AgoraWeb.UserAuth do
+  @moduledoc """
+  Context module for user authentication related functions specific to the web interface.
+
+  This module handles functions like logging users in/out, fetching the current user
+  from the session, and authentication plugs for controllers.
+  """
   use AgoraWeb, :verified_routes
 
   import Plug.Conn

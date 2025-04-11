@@ -1,4 +1,10 @@
 defmodule Agora.Accounts.UserToken do
+  @moduledoc """
+  Defines the Ecto schema for user tokens.
+
+  These tokens are used for various authentication-related actions like
+  email confirmation, password reset, and remember-me functionality.
+  """
   use Ecto.Schema
   import Ecto.Query
   alias Agora.Accounts.UserToken

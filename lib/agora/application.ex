@@ -11,8 +11,7 @@ defmodule Agora.Application do
       AgoraWeb.Telemetry,
       Agora.Repo,
       {Ecto.Migrator,
-        repos: Application.fetch_env!(:agora, :ecto_repos),
-        skip: skip_migrations?()},
+       repos: Application.fetch_env!(:agora, :ecto_repos), skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:agora, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Agora.PubSub},
       # Start the Finch HTTP client for sending emails
