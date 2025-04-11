@@ -35,7 +35,11 @@ defmodule Agora.Forum do
       ** (Ecto.NoResultsError)
 
   """
-  def get_topic!(id), do: Repo.get!(Topic, id)
+  def get_topic!(id) do
+    Topic
+    |> Repo.get!(id)
+    |> Repo.preload([:parent_topic, :child_topics])
+  end
 
   @doc """
   Creates a topic.

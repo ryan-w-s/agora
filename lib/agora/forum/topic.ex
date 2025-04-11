@@ -1,4 +1,7 @@
 defmodule Agora.Forum.Topic do
+  @moduledoc """
+  Represents a Forum Topic, which can contain threads and be nested.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

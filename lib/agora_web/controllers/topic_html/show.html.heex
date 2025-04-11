@@ -1,16 +1,33 @@
 <.header>
-  Topic {@topic.id}
-  <:subtitle>This is a topic record from your database.</:subtitle>
+  {@topic.name}
+  <:subtitle>{@topic.description}</:subtitle>
   <:actions>
+    <.link :if={@topic.parent_topic} navigate={~p"/topics/#{@topic.parent_topic}"} class="mr-4">
+      <.button>Parent: {@topic.parent_topic.name}</.button>
+    </.link>
     <.link href={~p"/topics/#{@topic}/edit"}>
       <.button>Edit topic</.button>
     </.link>
   </:actions>
 </.header>
 
-<.list>
-  <:item title="Name">{@topic.name}</:item>
-  <:item title="Description">{@topic.description}</:item>
+<.header>
+  Child Topics
+</.header>
+
+<.list :if={@topic.child_topics != []}>
+  <:item :for={child_topic <- @topic.child_topics} title={child_topic.name}>
+    <.link navigate={~p"/topics/#{child_topic}"}>View</.link>
+  </:item>
 </.list>
+<p :if={@topic.child_topics == []}>This topic has no child topics.</p>
+
+
+<.header class="mt-6">
+  Threads
+</.header>
+
+<%# TODO: List threads belonging to this topic %>
+<p>Threads will be listed here.</p>
 
 <.back navigate={~p"/topics"}>Back to topics</.back>
