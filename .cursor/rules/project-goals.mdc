@@ -40,4 +40,5 @@ Modern forum service.
 # Instructions
 
 Use phoenix commands if they are available for the task, such as `mix phx.gen`.
+Code can be formatted with `mix format` or given more detailed lint messages with `mix credo`.
 Produce high-quality, well-structured, readable code with an appropriate ammount of useful comments.
