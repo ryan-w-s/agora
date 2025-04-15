@@ -50,7 +50,11 @@ defmodule AgoraWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-background/80 fixed inset-0 transition-opacity backdrop-blur-sm" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class="bg-background/80 fixed inset-0 transition-opacity backdrop-blur-sm"
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -117,7 +121,8 @@ defmodule AgoraWeb.CoreComponents do
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
         @kind == :info && "bg-secondary text-foreground ring-border fill-foreground",
-        @kind == :error && "bg-destructive text-destructive-foreground ring-border fill-destructive-foreground"
+        @kind == :error &&
+          "bg-destructive text-destructive-foreground ring-border fill-destructive-foreground"
       ]}
       {@rest}
     >
@@ -354,7 +359,11 @@ defmodule AgoraWeb.CoreComponents do
       <textarea
         id={@id}
         name={@name}
-        class={["mt-2 block w-full rounded-lg bg-input text-foreground focus:ring-2 focus:ring-ring focus:ring-offset-background sm:text-sm sm:leading-6 min-h-[6rem]", @errors == [] && "border-border", @errors != [] && "border-destructive focus:ring-destructive"]}
+        class={[
+          "mt-2 block w-full rounded-lg bg-input text-foreground focus:ring-2 focus:ring-ring focus:ring-offset-background sm:text-sm sm:leading-6 min-h-[6rem]",
+          @errors == [] && "border-border",
+          @errors != [] && "border-destructive focus:ring-destructive"
+        ]}
         {@rest}
       >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       <.error :for={msg <- @errors}>{msg}</.error>
@@ -411,7 +420,11 @@ defmodule AgoraWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class={[@required && "required", "block text-sm font-medium leading-6 text-foreground", @class]} {@rest}>
+    <label
+      for={@for}
+      class={[@required && "required", "block text-sm font-medium leading-6 text-foreground", @class]}
+      {@rest}
+    >
       {render_slot(@inner_block)}
     </label>
     """
@@ -420,6 +433,7 @@ defmodule AgoraWeb.CoreComponents do
   @doc """
   Generates a generic error message.
   """
+  attr :rest, :global
   slot :inner_block, required: true
 
   def error(assigns) do
