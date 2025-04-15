@@ -14,7 +14,25 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: "#FD4F00",
+        background: 'hsl(220, 40%, 10%)', // Dark Navy
+        foreground: 'hsl(210 40% 98%)', // slate-50 adjusted
+        card: 'hsl(220, 40%, 10%)', // Match background
+        'card-foreground': 'hsl(210 40% 98%)',
+        popover: 'hsl(220, 40%, 10%)', // Match background
+        'popover-foreground': 'hsl(210 40% 98%)',
+        primary: 'hsl(217.2 91.2% 59.8%)', // blue-500
+        'primary-foreground': 'hsl(210 40% 98%)',
+        secondary: 'hsl(217 32.6% 17.5%)', // slate-800 adjusted
+        'secondary-foreground': 'hsl(210 40% 98%)',
+        muted: 'hsl(217 32.6% 17.5%)',
+        'muted-foreground': 'hsl(215 20.2% 65.1%)', // slate-400 adjusted
+        accent: 'hsl(217 32.6% 17.5%)',
+        'accent-foreground': 'hsl(210 40% 98%)',
+        destructive: 'hsl(0 62.8% 30.6%)', // red-900 adjusted
+        'destructive-foreground': 'hsl(210 40% 98%)',
+        border: 'hsl(217 32.6% 17.5%)',
+        input: 'hsl(217 32.6% 17.5%)',
+        ring: 'hsl(217.2 91.2% 59.8%)', // blue-500 for focus rings
       }
     },
   },

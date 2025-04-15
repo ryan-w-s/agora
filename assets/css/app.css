@@ -3,3 +3,9 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}

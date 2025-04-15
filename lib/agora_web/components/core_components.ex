@@ -50,7 +50,7 @@ defmodule AgoraWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div id={"#{@id}-bg"} class="bg-background/80 fixed inset-0 transition-opacity backdrop-blur-sm" aria-hidden="true" />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -66,13 +66,13 @@ defmodule AgoraWeb.CoreComponents do
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+              class="border-border ring-border relative hidden rounded-2xl border bg-card p-14 text-card-foreground shadow-lg ring-1 transition"
             >
               <div class="absolute top-6 right-5">
                 <button
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
                   type="button"
-                  class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
+                  class="-m-3 flex-none p-3 opacity-70 hover:opacity-100"
                   aria-label={gettext("close")}
                 >
                   <.icon name="hero-x-mark-solid" class="h-5 w-5" />
@@ -116,8 +116,8 @@ defmodule AgoraWeb.CoreComponents do
       role="alert"
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+        @kind == :info && "bg-secondary text-foreground ring-border fill-foreground",
+        @kind == :error && "bg-destructive text-destructive-foreground ring-border fill-destructive-foreground"
       ]}
       {@rest}
     >
@@ -128,7 +128,7 @@ defmodule AgoraWeb.CoreComponents do
       </p>
       <p class="mt-2 text-sm leading-5">{msg}</p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
-        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
+        <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-70 group-hover:opacity-100" />
       </button>
     </div>
     """
@@ -202,7 +202,7 @@ defmodule AgoraWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-10 space-y-8">
         {render_slot(@inner_block, f)}
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           {render_slot(action, f)}
@@ -231,8 +231,8 @@ defmodule AgoraWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded-lg bg-primary hover:bg-primary/90 py-2 px-3",
+        "text-sm font-semibold leading-6 text-primary-foreground active:opacity-80",
         @class
       ]}
       {@rest}
@@ -310,7 +310,7 @@ defmodule AgoraWeb.CoreComponents do
 
     ~H"""
     <div>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+      <label class="flex items-center gap-4 text-sm leading-6 text-foreground">
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <input
           type="checkbox"
@@ -318,7 +318,7 @@ defmodule AgoraWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
+          class="rounded border-border text-primary focus:ring-ring focus:ring-offset-background"
           {@rest}
         />
         {@label}
@@ -335,7 +335,7 @@ defmodule AgoraWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
+        class="mt-2 block w-full rounded-lg border border-border bg-input text-foreground shadow-sm focus:ring-2 focus:ring-ring focus:ring-offset-background sm:text-sm"
         multiple={@multiple}
         {@rest}
       >
@@ -354,11 +354,7 @@ defmodule AgoraWeb.CoreComponents do
       <textarea
         id={@id}
         name={@name}
-        class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 min-h-[6rem]",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
-        ]}
+        class={["mt-2 block w-full rounded-lg bg-input text-foreground focus:ring-2 focus:ring-ring focus:ring-offset-background sm:text-sm sm:leading-6 min-h-[6rem]", @errors == [] && "border-border", @errors != [] && "border-destructive focus:ring-destructive"]}
         {@rest}
       >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       <.error :for={msg <- @errors}>{msg}</.error>
@@ -368,22 +364,38 @@ defmodule AgoraWeb.CoreComponents do
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
+    assigns = assign_new(assigns, :rest, fn -> %{} end)
+    assigns = assign_new(assigns, :type, fn -> "text" end)
+
     ~H"""
-    <div>
-      <.label for={@id}>{@label}</.label>
-      <input
-        type={@type}
-        name={@name}
-        id={@id}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
-        ]}
-        {@rest}
-      />
-      <.error :for={msg <- @errors}>{msg}</.error>
+    <div phx-feedback-for={@name} class="pt-4">
+      <.label :if={@label} for={@id} class="block text-sm font-semibold leading-6">
+        {@label}
+      </.label>
+      <div class="relative mt-2 rounded-lg shadow-sm">
+        <input
+          type={@type}
+          name={@name}
+          id={@id}
+          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+          class={[
+            "block w-full rounded-lg border-0 py-1.5 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
+            "bg-input border-border text-foreground placeholder:text-muted-foreground ring-border focus:ring-ring",
+            @errors == [] && "ring-border",
+            @errors != [] && "ring-destructive focus:ring-destructive"
+          ]}
+          {@rest}
+        />
+        <.icon
+          :if={@errors != []}
+          name="hero-exclamation-circle-solid"
+          class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 h-5 w-5 fill-destructive"
+        />
+      </div>
+      <.error :for={msg <- @errors}>* {msg}</.error>
+      <p :if={assigns[:help_text]} class="mt-2 text-sm leading-6 text-muted-foreground">
+        {assigns[:help_text]}
+      </p>
     </div>
     """
   end
@@ -392,11 +404,14 @@ defmodule AgoraWeb.CoreComponents do
   Renders a label.
   """
   attr :for, :string, default: nil
+  attr :required, :boolean, default: false
+  attr :class, :string, default: nil
+  attr :rest, :global
   slot :inner_block, required: true
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class={[@required && "required", "block text-sm font-medium leading-6 text-foreground", @class]} {@rest}>
       {render_slot(@inner_block)}
     </label>
     """
@@ -409,8 +424,7 @@ defmodule AgoraWeb.CoreComponents do
 
   def error(assigns) do
     ~H"""
-    <p class="mt-3 flex gap-3 text-sm leading-6 text-rose-600">
-      <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
+    <p class="mt-1 flex gap-3 text-sm leading-6 text-destructive" {@rest}>
       {render_slot(@inner_block)}
     </p>
     """
@@ -429,10 +443,10 @@ defmodule AgoraWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h1 class="text-lg font-semibold leading-8 text-foreground">
           {render_slot(@inner_block)}
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
+        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-muted-foreground">
           {render_slot(@subtitle)}
         </p>
       </div>
@@ -475,7 +489,7 @@ defmodule AgoraWeb.CoreComponents do
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
       <table class="w-[40rem] mt-11 sm:w-full">
-        <thead class="text-sm text-left leading-6 text-zinc-500">
+        <thead class="text-sm text-left leading-6 text-muted-foreground">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal">{col[:label]}</th>
             <th :if={@action != []} class="relative p-0 pb-4">
@@ -486,27 +500,27 @@ defmodule AgoraWeb.CoreComponents do
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          class="relative divide-y divide-border border-t border-border text-sm leading-6 text-foreground"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
+          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-secondary/80">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
               class={["relative p-0", @row_click && "hover:cursor-pointer"]}
             >
               <div class="block py-4 pr-6">
-                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-secondary/80 sm:rounded-l-xl" />
+                <span class={["relative", i == 0 && "font-semibold text-foreground"]}>
                   {render_slot(col, @row_item.(row))}
                 </span>
               </div>
             </td>
             <td :if={@action != []} class="relative w-14 p-0">
               <div class="relative whitespace-nowrap py-4 text-right text-sm font-medium">
-                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
+                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-secondary/80 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
-                  class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  class="relative ml-4 font-semibold leading-6 text-primary hover:text-primary/90"
                 >
                   {render_slot(action, @row_item.(row))}
                 </span>
@@ -536,10 +550,10 @@ defmodule AgoraWeb.CoreComponents do
   def list(assigns) do
     ~H"""
     <div class="mt-14">
-      <dl class="-my-4 divide-y divide-zinc-100">
+      <dl class="-my-4 divide-y divide-border">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-zinc-500">{item.title}</dt>
-          <dd class="text-zinc-700">{render_slot(item)}</dd>
+          <dt class="w-1/4 flex-none text-muted-foreground">{item.title}</dt>
+          <dd class="text-foreground">{render_slot(item)}</dd>
         </div>
       </dl>
     </div>
@@ -561,7 +575,7 @@ defmodule AgoraWeb.CoreComponents do
     <div class="mt-16">
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class="text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground"
       >
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         {render_slot(@inner_block)}
