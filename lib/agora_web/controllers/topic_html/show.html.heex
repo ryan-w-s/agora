@@ -1,10 +1,12 @@
 <.header>
   {@topic.name}
   <:subtitle>{@topic.description}</:subtitle>
+  
   <:actions>
     <.link :if={@topic.parent_topic} navigate={~p"/topics/#{@topic.parent_topic}"} class="mr-4">
       <.button>Parent: {@topic.parent_topic.name}</.button>
     </.link>
+    
     <.link href={~p"/topics/#{@topic}/edit"}>
       <.button>Edit topic</.button>
     </.link>
@@ -20,6 +22,7 @@
     <.link navigate={~p"/topics/#{child_topic}"}>View</.link>
   </:item>
 </.list>
+
 <p :if={@topic.child_topics == []}>This topic has no child topics.</p>
 
 <.header class="mt-6">
