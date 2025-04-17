@@ -83,7 +83,8 @@ defmodule Agora.MixProject do
         "esbuild agora --minify",
         "phx.digest"
       ],
-      check: ["format", "credo", "compile"]
+      check: ["format", "credo", "compile"],
+      cleanup: ["ecto.drop", "clean --all"]
     ]
   end
 end

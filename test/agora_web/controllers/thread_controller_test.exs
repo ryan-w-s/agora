@@ -3,6 +3,17 @@ defmodule AgoraWeb.ThreadControllerTest do
 
   import Agora.ForumFixtures
 
+  defp log_in_user(context) do
+    register_and_log_in_user(context)
+  end
+
+  defp create_topic(_) do
+    topic = topic_fixture()
+    %{topic: topic}
+  end
+
+  setup [:log_in_user, :create_topic]
+
   @create_attrs %{title: "some title", body: "some body"}
   @update_attrs %{title: "some updated title", body: "some updated body"}
   @invalid_attrs %{title: nil, body: nil}
@@ -15,15 +26,23 @@ defmodule AgoraWeb.ThreadControllerTest do
   end
 
   describe "new thread" do
+    setup [:log_in_user]
+
     test "renders form", %{conn: conn} do
       conn = get(conn, ~p"/threads/new")
       assert html_response(conn, 200) =~ "New Thread"
     end
+
+    test "renders form with topic_id", %{conn: conn, topic: topic} do
+      conn = get(conn, ~p"/threads/new?topic_id=#{topic.id}")
+      assert html_response(conn, 200) =~ "New Thread"
+      assert conn.resp_body =~ "option selected value=\"#{topic.id}\""
+    end
   end
 
   describe "create thread" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/threads", thread: @create_attrs)
+    test "redirects to show when data is valid", %{conn: conn, topic: topic} do
+      conn = post(conn, ~p"/threads", thread: Map.put(@create_attrs, :topic_id, topic.id))
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == ~p"/threads/#{id}"
@@ -32,8 +51,8 @@ defmodule AgoraWeb.ThreadControllerTest do
       assert html_response(conn, 200) =~ "Thread #{id}"
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/threads", thread: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn, topic: topic} do
+      conn = post(conn, ~p"/threads", thread: Map.put(@invalid_attrs, :topic_id, topic.id))
       assert html_response(conn, 200) =~ "New Thread"
     end
   end
@@ -50,16 +69,20 @@ defmodule AgoraWeb.ThreadControllerTest do
   describe "update thread" do
     setup [:create_thread]
 
-    test "redirects when data is valid", %{conn: conn, thread: thread} do
-      conn = put(conn, ~p"/threads/#{thread}", thread: @update_attrs)
+    test "redirects when data is valid", %{conn: conn, thread: thread, topic: topic} do
+      conn =
+        put(conn, ~p"/threads/#{thread}", thread: Map.put(@update_attrs, :topic_id, topic.id))
+
       assert redirected_to(conn) == ~p"/threads/#{thread}"
 
       conn = get(conn, ~p"/threads/#{thread}")
       assert html_response(conn, 200) =~ "some updated title"
     end
 
-    test "renders errors when data is invalid", %{conn: conn, thread: thread} do
-      conn = put(conn, ~p"/threads/#{thread}", thread: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn, thread: thread, topic: topic} do
+      conn =
+        put(conn, ~p"/threads/#{thread}", thread: Map.put(@invalid_attrs, :topic_id, topic.id))
+
       assert html_response(conn, 200) =~ "Edit Thread"
     end
   end
@@ -77,8 +100,8 @@ defmodule AgoraWeb.ThreadControllerTest do
     end
   end
 
-  defp create_thread(_) do
-    thread = thread_fixture()
+  defp create_thread(%{user: user, topic: topic}) do
+    thread = thread_fixture(%{user_id: user.id, topic_id: topic.id})
     %{thread: thread}
   end
 end

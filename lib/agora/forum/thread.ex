@@ -8,6 +8,8 @@ defmodule Agora.Forum.Thread do
   alias Agora.Accounts.User
   alias Agora.Forum.Topic
 
+  @derive {Jason.Encoder,
+           only: [:id, :title, :body, :topic_id, :user_id, :inserted_at, :updated_at]}
   schema "threads" do
     field :title, :string
     field :body, :string

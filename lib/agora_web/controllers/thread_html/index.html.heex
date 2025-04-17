@@ -8,7 +8,9 @@
 </.header>
 
 <.table id="threads" rows={@threads} row_click={&JS.navigate(~p"/threads/#{&1}")}>
-  <:col :let={thread} label="Title">{thread.title}</:col>
+  <:col :let={thread} label="Title">
+    <.link navigate={~p"/threads/#{thread}"}>{thread.title}</.link>
+  </:col>
   <:col :let={thread} label="Body">{thread.body}</:col>
   <:action :let={thread}>
     <div class="sr-only">

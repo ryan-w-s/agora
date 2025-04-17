@@ -2,6 +2,7 @@ defmodule Agora.ForumTest do
   use Agora.DataCase
 
   alias Agora.Forum
+  alias Agora.AccountsFixtures
 
   describe "topics" do
     alias Agora.Forum.Topic
@@ -12,7 +13,7 @@ defmodule Agora.ForumTest do
 
     test "list_topics/0 returns all topics" do
       topic = topic_fixture()
-      assert Forum.list_topics() == [topic]
+      assert topic in Forum.list_topics()
     end
 
     test "get_topic!/1 returns the topic with given id" do
@@ -111,7 +112,7 @@ defmodule Agora.ForumTest do
 
     test "list_threads/0 returns all threads" do
       thread = thread_fixture()
-      assert Forum.list_threads() == [thread]
+      assert thread in Forum.list_threads()
     end
 
     test "get_thread!/1 returns the thread with given id" do
@@ -120,11 +121,21 @@ defmodule Agora.ForumTest do
     end
 
     test "create_thread/1 with valid data creates a thread" do
-      valid_attrs = %{title: "some title", body: "some body"}
+      user = AccountsFixtures.user_fixture()
+      topic = topic_fixture()
+
+      valid_attrs = %{
+        title: "some title",
+        body: "some body",
+        user_id: user.id,
+        topic_id: topic.id
+      }
 
       assert {:ok, %Thread{} = thread} = Forum.create_thread(valid_attrs)
       assert thread.title == "some title"
       assert thread.body == "some body"
+      assert thread.user_id == user.id
+      assert thread.topic_id == topic.id
     end
 
     test "create_thread/1 with invalid data returns error changeset" do

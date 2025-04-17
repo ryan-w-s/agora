@@ -4,6 +4,9 @@ defmodule Agora.ForumFixtures do
   entities via the `Agora.Forum` context.
   """
 
+  alias Agora.Forum
+  alias Agora.AccountsFixtures
+
   @doc """
   Generate a topic.
   """
@@ -23,13 +26,19 @@ defmodule Agora.ForumFixtures do
   Generate a thread.
   """
   def thread_fixture(attrs \\ %{}) do
-    {:ok, thread} =
-      attrs
-      |> Enum.into(%{
-        body: "some body",
-        title: "some title"
-      })
-      |> Agora.Forum.create_thread()
+    user = Map.get(attrs, :user) || AccountsFixtures.user_fixture()
+    topic = Map.get(attrs, :topic) || topic_fixture()
+
+    default_attrs = %{
+      body: "some body",
+      title: "some title",
+      user_id: user.id,
+      topic_id: topic.id
+    }
+
+    final_attrs = Map.merge(default_attrs, attrs)
+
+    {:ok, thread} = Forum.create_thread(final_attrs)
 
     thread
   end

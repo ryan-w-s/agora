@@ -8,6 +8,8 @@ defmodule AgoraWeb.ThreadHTML do
   """
   attr :changeset, Ecto.Changeset, required: true
   attr :action, :string, required: true
+  attr :topic_id, :any, default: nil
+  attr :topics, :list, required: true
 
   def thread_form(assigns)
 end
