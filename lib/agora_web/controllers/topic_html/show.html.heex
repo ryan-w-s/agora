@@ -1,12 +1,12 @@
 <.header>
   {@topic.name}
   <:subtitle>{@topic.description}</:subtitle>
-  
+
   <:actions>
     <.link :if={@topic.parent_topic} navigate={~p"/topics/#{@topic.parent_topic}"} class="mr-4">
       <.button>Parent: {@topic.parent_topic.name}</.button>
     </.link>
-    
+
     <.link href={~p"/topics/#{@topic}/edit"}>
       <.button>Edit topic</.button>
     </.link>
@@ -27,6 +27,11 @@
 
 <.header class="mt-6">
   Threads
+  <:actions>
+    <.link href={~p"/threads/new?topic_id=#{@topic.id}"}>
+      <.button>New Thread</.button>
+    </.link>
+  </:actions>
 </.header>
 
 <p>Threads will be listed here.</p>

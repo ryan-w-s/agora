@@ -1,0 +1,16 @@
+<.header>
+  Thread {@thread.id}
+  <:subtitle>This is a thread record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/threads/#{@thread}/edit"}>
+      <.button>Edit thread</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title">{@thread.title}</:item>
+  <:item title="Body">{@thread.body}</:item>
+</.list>
+
+<.back navigate={~p"/threads"}>Back to threads</.back>

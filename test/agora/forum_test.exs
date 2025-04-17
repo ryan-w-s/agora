@@ -101,4 +101,60 @@ defmodule Agora.ForumTest do
       assert %Ecto.Changeset{} = Forum.change_topic(topic)
     end
   end
+
+  describe "threads" do
+    alias Agora.Forum.Thread
+
+    import Agora.ForumFixtures
+
+    @invalid_attrs %{title: nil, body: nil}
+
+    test "list_threads/0 returns all threads" do
+      thread = thread_fixture()
+      assert Forum.list_threads() == [thread]
+    end
+
+    test "get_thread!/1 returns the thread with given id" do
+      thread = thread_fixture()
+      assert Forum.get_thread!(thread.id) == thread
+    end
+
+    test "create_thread/1 with valid data creates a thread" do
+      valid_attrs = %{title: "some title", body: "some body"}
+
+      assert {:ok, %Thread{} = thread} = Forum.create_thread(valid_attrs)
+      assert thread.title == "some title"
+      assert thread.body == "some body"
+    end
+
+    test "create_thread/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Forum.create_thread(@invalid_attrs)
+    end
+
+    test "update_thread/2 with valid data updates the thread" do
+      thread = thread_fixture()
+      update_attrs = %{title: "some updated title", body: "some updated body"}
+
+      assert {:ok, %Thread{} = thread} = Forum.update_thread(thread, update_attrs)
+      assert thread.title == "some updated title"
+      assert thread.body == "some updated body"
+    end
+
+    test "update_thread/2 with invalid data returns error changeset" do
+      thread = thread_fixture()
+      assert {:error, %Ecto.Changeset{}} = Forum.update_thread(thread, @invalid_attrs)
+      assert thread == Forum.get_thread!(thread.id)
+    end
+
+    test "delete_thread/1 deletes the thread" do
+      thread = thread_fixture()
+      assert {:ok, %Thread{}} = Forum.delete_thread(thread)
+      assert_raise Ecto.NoResultsError, fn -> Forum.get_thread!(thread.id) end
+    end
+
+    test "change_thread/1 returns a thread changeset" do
+      thread = thread_fixture()
+      assert %Ecto.Changeset{} = Forum.change_thread(thread)
+    end
+  end
 end

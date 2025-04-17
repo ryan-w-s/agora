@@ -18,4 +18,19 @@ defmodule Agora.ForumFixtures do
 
     topic
   end
+
+  @doc """
+  Generate a thread.
+  """
+  def thread_fixture(attrs \\ %{}) do
+    {:ok, thread} =
+      attrs
+      |> Enum.into(%{
+        body: "some body",
+        title: "some title"
+      })
+      |> Agora.Forum.create_thread()
+
+    thread
+  end
 end

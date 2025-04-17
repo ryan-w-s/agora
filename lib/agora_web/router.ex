@@ -22,6 +22,7 @@ defmodule AgoraWeb.Router do
 
     get "/", PageController, :home
     resources "/topics", TopicController
+    resources "/threads", ThreadController
   end
 
   # Other scopes may use custom stacks.

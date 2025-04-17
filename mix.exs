@@ -82,7 +82,8 @@ defmodule Agora.MixProject do
         "tailwind agora --minify",
         "esbuild agora --minify",
         "phx.digest"
-      ]
+      ],
+      check: ["format", "credo", "compile"]
     ]
   end
 end

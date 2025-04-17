@@ -1,0 +1,8 @@
+<.header>
+  Edit Thread {@thread.id}
+  <:subtitle>Use this form to manage thread records in your database.</:subtitle>
+</.header>
+
+<.thread_form changeset={@changeset} action={~p"/threads/#{@thread}"} />
+
+<.back navigate={~p"/threads"}>Back to threads</.back>
