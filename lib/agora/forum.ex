@@ -106,6 +106,29 @@ defmodule Agora.Forum do
     Topic.changeset(topic, attrs)
   end
 
+  @doc """
+  Gets a single topic by its name.
+
+  Returns `nil` if the topic does not exist.
+
+  ## Examples
+
+      iex> get_topic_by_name("General Discussion")
+      %Topic{}
+
+      iex> get_topic_by_name("NonExistentTopic")
+      nil
+
+  """
+  def get_topic_by_name(name) do
+    Topic
+    |> Repo.get_by(name: name)
+    |> case do
+      nil -> nil
+      topic -> Repo.preload(topic, [:parent_topic, :child_topics])
+    end
+  end
+
   alias Agora.Forum.Thread
 
   @doc """
