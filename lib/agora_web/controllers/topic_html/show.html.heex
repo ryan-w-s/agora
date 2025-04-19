@@ -34,6 +34,17 @@
   </:actions>
 </.header>
 
-<p>Threads will be listed here.</p>
+<.table :if={@topic.threads != []} id="threads" rows={@topic.threads}>
+  <:col :let={thread} label="Title">{thread.title}</:col>
+  <:col :let={thread} label="Author">{thread.user.username}</:col>
+  <:col :let={thread} label="Last Updated">
+    {thread.updated_at}
+  </:col>
+  <:action :let={thread}>
+    <.link navigate={~p"/threads/#{thread}"}>View</.link>
+  </:action>
+</.table>
+
+<p :if={@topic.threads == []}>This topic has no threads yet.</p>
 
 <.back navigate={~p"/topics"}>Back to topics</.back>

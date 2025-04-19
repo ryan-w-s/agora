@@ -12,6 +12,8 @@ defmodule Agora.Forum.Topic do
     belongs_to :parent_topic, Agora.Forum.Topic, foreign_key: :parent_topic_id
     has_many :child_topics, Agora.Forum.Topic, foreign_key: :parent_topic_id
 
+    has_many :threads, Agora.Forum.Thread
+
     timestamps(type: :utc_datetime)
   end
 

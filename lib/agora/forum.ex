@@ -38,7 +38,7 @@ defmodule Agora.Forum do
   def get_topic!(id) do
     Topic
     |> Repo.get!(id)
-    |> Repo.preload([:parent_topic, :child_topics])
+    |> Repo.preload([:parent_topic, :child_topics, threads: [:user]])
   end
 
   @doc """
