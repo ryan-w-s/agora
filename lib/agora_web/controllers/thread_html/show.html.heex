@@ -13,4 +13,17 @@
   <:item title="Body">{@thread.body}</:item>
 </.list>
 
-<.back navigate={~p"/threads"}>Back to threads</.back>
+<div class="mt-8 space-y-2">
+  <.link
+    navigate={~p"/topics/#{@thread.topic_id}"}
+    class="block text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground"
+  >
+    <.icon name="hero-arrow-left-solid" class="h-3 w-3" /> Back to topic
+  </.link>
+  <.link
+    navigate={~p"/threads"}
+    class="block text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground"
+  >
+    <.icon name="hero-arrow-left-solid" class="h-3 w-3" /> All Threads
+  </.link>
+</div>
