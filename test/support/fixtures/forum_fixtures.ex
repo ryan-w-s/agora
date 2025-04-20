@@ -42,4 +42,18 @@ defmodule Agora.ForumFixtures do
 
     thread
   end
+
+  @doc """
+  Generate a comment.
+  """
+  def comment_fixture(attrs \\ %{}) do
+    {:ok, comment} =
+      attrs
+      |> Enum.into(%{
+        body: "some body"
+      })
+      |> Agora.Forum.create_comment()
+
+    comment
+  end
 end

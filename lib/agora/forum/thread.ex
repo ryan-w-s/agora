@@ -7,6 +7,7 @@ defmodule Agora.Forum.Thread do
   import Ecto.Changeset
   alias Agora.Accounts.User
   alias Agora.Forum.Topic
+  alias Agora.Forum.Comment
 
   @derive {Jason.Encoder,
            only: [:id, :title, :body, :topic_id, :user_id, :inserted_at, :updated_at]}
@@ -16,6 +17,8 @@ defmodule Agora.Forum.Thread do
 
     belongs_to :user, User
     belongs_to :topic, Topic
+
+    has_many :comments, Comment
 
     timestamps(type: :utc_datetime)
   end
