@@ -187,10 +187,22 @@ defmodule Agora.ForumTest do
     end
 
     test "create_comment/1 with valid data creates a comment" do
-      valid_attrs = %{body: "some body"}
+      # Setup: Create required user and thread
+      user = AccountsFixtures.user_fixture()
+      thread = thread_fixture()
+
+      # Add user_id and thread_id to valid_attrs
+      valid_attrs = %{
+        body: "some body",
+        user_id: user.id,
+        thread_id: thread.id
+      }
 
       assert {:ok, %Comment{} = comment} = Forum.create_comment(valid_attrs)
       assert comment.body == "some body"
+      # Also assert associations were set correctly
+      assert comment.user_id == user.id
+      assert comment.thread_id == thread.id
     end
 
     test "create_comment/1 with invalid data returns error changeset" do
@@ -220,6 +232,50 @@ defmodule Agora.ForumTest do
     test "change_comment/1 returns a comment changeset" do
       comment = comment_fixture()
       assert %Ecto.Changeset{} = Forum.change_comment(comment)
+    end
+
+    test "list_comments_for_thread/1 returns chronologically ordered comments for a specific thread" do
+      # Setup: User, Topic, 2 Threads
+      user = AccountsFixtures.user_fixture()
+      topic = topic_fixture()
+      thread1 = thread_fixture(%{user_id: user.id, topic_id: topic.id})
+      thread2 = thread_fixture(%{user_id: user.id, topic_id: topic.id})
+
+      # Create comments for thread1 (ensure different insertion times)
+      comment1_t1 =
+        comment_fixture(%{
+          body: "First comment on thread 1",
+          user_id: user.id,
+          thread_id: thread1.id
+        })
+
+      # Simulate time passing
+      Process.sleep(10)
+
+      comment2_t1 =
+        comment_fixture(%{
+          body: "Second comment on thread 1",
+          user_id: user.id,
+          thread_id: thread1.id
+        })
+
+      # Create comment for thread2
+      _comment1_t2 =
+        comment_fixture(%{
+          body: "First comment on thread 2",
+          user_id: user.id,
+          thread_id: thread2.id
+        })
+
+      # Fetch comments for thread1
+      comments_for_thread1 = Forum.list_comments_for_thread(thread1.id)
+
+      # Assertions
+      assert length(comments_for_thread1) == 2
+      assert Enum.map(comments_for_thread1, & &1.id) == [comment1_t1.id, comment2_t1.id]
+      assert Enum.all?(comments_for_thread1, fn c -> c.thread_id == thread1.id end)
+      # Check preload
+      assert Enum.all?(comments_for_thread1, fn c -> c.user.id == user.id end)
     end
   end
 end

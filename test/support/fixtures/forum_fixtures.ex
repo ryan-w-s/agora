@@ -47,12 +47,22 @@ defmodule Agora.ForumFixtures do
   Generate a comment.
   """
   def comment_fixture(attrs \\ %{}) do
-    {:ok, comment} =
-      attrs
-      |> Enum.into(%{
-        body: "some body"
-      })
-      |> Agora.Forum.create_comment()
+    # Ensure required associations exist if not provided
+    user = Map.get(attrs, :user) || AccountsFixtures.user_fixture()
+    thread = Map.get(attrs, :thread) || thread_fixture()
+
+    # Define default attributes including the required IDs
+    default_attrs = %{
+      body: "some body",
+      user_id: user.id,
+      thread_id: thread.id
+    }
+
+    # Merge provided attrs, potentially overriding defaults
+    final_attrs = Map.merge(default_attrs, attrs)
+
+    # Create the comment
+    {:ok, comment} = Forum.create_comment(final_attrs)
 
     comment
   end

@@ -320,4 +320,23 @@ defmodule Agora.Forum do
   def change_comment(%Comment{} = comment, attrs \\ %{}) do
     Comment.changeset(comment, attrs)
   end
+
+  @doc """
+  Returns the list of comments for a given thread, ordered chronologically.
+
+  Preloads the associated user for each comment.
+
+  ## Examples
+
+      iex> list_comments_for_thread(123)
+      [%Comment{user: %User{}}, ...]
+
+  """
+  def list_comments_for_thread(thread_id) do
+    Comment
+    |> where(thread_id: ^thread_id)
+    |> order_by(asc: :inserted_at)
+    |> preload(:user)
+    |> Repo.all()
+  end
 end
