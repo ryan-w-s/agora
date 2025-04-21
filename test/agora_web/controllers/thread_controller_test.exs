@@ -48,7 +48,8 @@ defmodule AgoraWeb.ThreadControllerTest do
       assert redirected_to(conn) == ~p"/threads/#{id}"
 
       conn = get(conn, ~p"/threads/#{id}")
-      assert html_response(conn, 200) =~ "Thread #{id}"
+      assert html_response(conn, 200) =~ @create_attrs.title
+      assert html_response(conn, 200) =~ conn.assigns.current_user.username
     end
 
     test "renders errors when data is invalid", %{conn: conn, topic: topic} do

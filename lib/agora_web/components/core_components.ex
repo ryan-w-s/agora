@@ -353,6 +353,18 @@ defmodule AgoraWeb.CoreComponents do
   end
 
   def input(%{type: "textarea"} = assigns) do
+    assigns =
+      assigns
+      |> assign_new(:id, fn ->
+        Phoenix.HTML.Form.input_id(elem(assigns.field, 0), elem(assigns.field, 1))
+      end)
+      |> assign_new(:name, fn ->
+        Phoenix.HTML.Form.input_name(elem(assigns.field, 0), elem(assigns.field, 1))
+      end)
+      |> assign_new(:value, fn ->
+        Phoenix.HTML.Form.input_value(elem(assigns.field, 0), elem(assigns.field, 1))
+      end)
+
     ~H"""
     <div>
       <.label for={@id}>{@label}</.label>

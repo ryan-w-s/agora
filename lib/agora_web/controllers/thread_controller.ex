@@ -3,6 +3,7 @@ defmodule AgoraWeb.ThreadController do
 
   alias Agora.Forum
   alias Agora.Forum.Thread
+  alias Agora.Forum.Comment
 
   def index(conn, _params) do
     threads = Forum.list_threads()
@@ -54,7 +55,14 @@ defmodule AgoraWeb.ThreadController do
     thread = Forum.get_thread!(id)
     # Fetch comments for the thread
     comments = Forum.list_comments_for_thread(thread.id)
-    render(conn, :show, thread: thread, comments: comments)
+    # Prepare an empty changeset for the new comment form
+    comment_changeset = Forum.change_comment(%Comment{})
+
+    render(conn, :show,
+      thread: thread,
+      comments: comments,
+      comment_changeset: comment_changeset
+    )
   end
 
   def edit(conn, %{"id" => id}) do

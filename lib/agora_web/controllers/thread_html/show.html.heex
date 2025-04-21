@@ -13,6 +13,12 @@
   <:item title="Body">{@thread.body}</:item>
 </.list>
 
+<h3 class="mt-8 mb-4 text-md font-semibold leading-tight text-brand">Post a Comment</h3>
+<.form :let={f} for={@comment_changeset} action={~p"/threads/#{@thread.id}/comments"}>
+  <.input field={{f, :body}} type="textarea" label="Comment" />
+  <.button class="mt-3">Post Comment</.button>
+</.form>
+
 <h2 class="mt-8 text-lg font-semibold leading-tight text-brand">Comments</h2>
 <div class="mt-4 space-y-4">
   <div :for={comment <- @comments} class="rounded-lg border bg-card p-4 shadow-sm">

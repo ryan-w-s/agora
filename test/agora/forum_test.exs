@@ -117,7 +117,10 @@ defmodule Agora.ForumTest do
 
     test "get_thread!/1 returns the thread with given id" do
       thread = thread_fixture()
-      assert Forum.get_thread!(thread.id) == thread
+      # Fetch the thread with preloaded user to compare
+      fetched_thread = Forum.get_thread!(thread.id)
+      assert fetched_thread.id == thread.id
+      assert fetched_thread.user != nil # Check that user is loaded
     end
 
     test "create_thread/1 with valid data creates a thread" do
@@ -154,7 +157,10 @@ defmodule Agora.ForumTest do
     test "update_thread/2 with invalid data returns error changeset" do
       thread = thread_fixture()
       assert {:error, %Ecto.Changeset{}} = Forum.update_thread(thread, @invalid_attrs)
-      assert thread == Forum.get_thread!(thread.id)
+      # Compare specific fields instead of the whole struct
+      fetched_thread_after_update = Forum.get_thread!(thread.id)
+      assert fetched_thread_after_update.title == thread.title
+      assert fetched_thread_after_update.body == thread.body
     end
 
     test "delete_thread/1 deletes the thread" do
