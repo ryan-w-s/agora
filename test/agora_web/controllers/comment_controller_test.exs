@@ -43,7 +43,7 @@ defmodule AgoraWeb.CommentControllerTest do
 
       # Verify comment was *not* created
       comments = Forum.list_comments_for_thread(thread.id)
-      assert length(comments) == 0
+      assert Enum.empty?(comments)
     end
   end
 end

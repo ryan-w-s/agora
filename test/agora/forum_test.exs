@@ -120,7 +120,8 @@ defmodule Agora.ForumTest do
       # Fetch the thread with preloaded user to compare
       fetched_thread = Forum.get_thread!(thread.id)
       assert fetched_thread.id == thread.id
-      assert fetched_thread.user != nil # Check that user is loaded
+      # Check that user is loaded
+      assert fetched_thread.user != nil
     end
 
     test "create_thread/1 with valid data creates a thread" do
