@@ -158,7 +158,11 @@ defmodule Agora.Forum do
       ** (Ecto.NoResultsError)
 
   """
-  def get_thread!(id), do: Repo.get!(Thread, id)
+  def get_thread!(id) do
+    Thread
+    |> Repo.get!(id)
+    |> Repo.preload(:user)
+  end
 
   @doc """
   Creates a thread.

@@ -1,6 +1,6 @@
 <.header>
-  Thread {@thread.id}
-  <:subtitle>This is a thread record from your database.</:subtitle>
+  {@thread.title}
+  <:subtitle>Posted by {@thread.user.username} on {@thread.inserted_at}</:subtitle>
   <:actions>
     <.link href={~p"/threads/#{@thread}/edit"}>
       <.button>Edit thread</.button>
@@ -12,6 +12,21 @@
   <:item title="Title">{@thread.title}</:item>
   <:item title="Body">{@thread.body}</:item>
 </.list>
+
+<h2 class="mt-8 text-lg font-semibold leading-tight text-brand">Comments</h2>
+<div class="mt-4 space-y-4">
+  <div :for={comment <- @comments} class="rounded-lg border bg-card p-4 shadow-sm">
+    <div class="mb-2 flex items-center space-x-2">
+      <.icon name="hero-user-circle" class="h-5 w-5 text-muted-foreground" />
+      <span class="text-sm font-medium text-foreground">{comment.user.username}</span>
+      <span class="text-xs text-muted-foreground">({comment.inserted_at})</span>
+    </div>
+    <p class="text-foreground">{comment.body}</p>
+  </div>
+  <div :if={@comments == []}>
+    <p class="text-muted-foreground">No comments yet.</p>
+  </div>
+</div>
 
 <div class="mt-8 space-y-2">
   <.link

@@ -52,7 +52,9 @@ defmodule AgoraWeb.ThreadController do
 
   def show(conn, %{"id" => id}) do
     thread = Forum.get_thread!(id)
-    render(conn, :show, thread: thread)
+    # Fetch comments for the thread
+    comments = Forum.list_comments_for_thread(thread.id)
+    render(conn, :show, thread: thread, comments: comments)
   end
 
   def edit(conn, %{"id" => id}) do

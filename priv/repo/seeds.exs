@@ -198,3 +198,81 @@ else
 end
 
 IO.puts("Thread seeding finished.")
+
+IO.puts("\\nSeeding comments...")
+
+# Find users and threads needed for comments
+alice = Agora.Accounts.get_user_by_email("alice@example.com")
+bob = Agora.Accounts.get_user_by_email("bob@example.com")
+charlie = Agora.Accounts.get_user_by_email("charlie@example.com")
+
+welcome_thread = Agora.Repo.get_by(Agora.Forum.Thread, title: "Welcome to Agora!")
+books_thread = Agora.Repo.get_by(Agora.Forum.Thread, title: "Favorite Books?")
+
+if !is_nil(alice) and !is_nil(bob) and !is_nil(charlie) and !is_nil(welcome_thread) and
+     !is_nil(books_thread) do
+  comments_to_insert = [
+    # Comments for "Welcome to Agora!"
+    %{
+      body: "Hi Alice! Glad to be here.",
+      user_id: bob.id,
+      thread_id: welcome_thread.id
+    },
+    %{
+      body: "Welcome Bob! Nice to see you.",
+      user_id: alice.id,
+      thread_id: welcome_thread.id
+    },
+    %{
+      body: "Hello everyone! Looking forward to discussions.",
+      user_id: charlie.id,
+      thread_id: welcome_thread.id
+    },
+    # Comments for "Favorite Books?"
+    %{
+      body: "I recently enjoyed \"Project Hail Mary\". Great sci-fi!",
+      user_id: alice.id,
+      thread_id: books_thread.id
+    },
+    %{
+      body: "Oh, I loved that one too! Have you read \"The Three-Body Problem\"?",
+      user_id: charlie.id,
+      thread_id: books_thread.id
+    }
+  ]
+
+  inserted_count = 0
+
+  Enum.each(comments_to_insert, fn comment_attrs ->
+    # Simple check to avoid duplicate comment content by the same user on the same thread
+    existing_comment = Agora.Repo.get_by(Agora.Forum.Comment, comment_attrs)
+
+    case existing_comment do
+      nil ->
+        changeset = Agora.Forum.Comment.changeset(%Agora.Forum.Comment{}, comment_attrs)
+
+        case Agora.Repo.insert(changeset) do
+          {:ok, comment} ->
+            IO.puts(
+              "Inserted comment by user ID: #{comment.user_id} on thread ID: #{comment.thread_id}"
+            )
+
+            inserted_count = inserted_count + 1
+
+          {:error, changeset} ->
+            IO.inspect(changeset, label: "Error inserting comment")
+        end
+
+      _ ->
+        IO.puts(
+          "Comment already exists (user: #{comment_attrs.user_id}, thread: #{comment_attrs.thread_id})"
+        )
+    end
+  end)
+
+  IO.puts("Finished processing comments. Newly inserted: #{inserted_count}")
+else
+  IO.puts("Could not find required users or threads to seed comments.")
+end
+
+IO.puts("Comment seeding finished.")
