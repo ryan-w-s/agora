@@ -22,23 +22,47 @@ import "phoenix_html"
 // import {LiveSocket} from "phoenix_live_view"
 // import topbar from "../vendor/topbar"
 
-// let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-// let liveSocket = new LiveSocket("/live", Socket, {
-//   longPollFallbackMs: 2500,
-//   params: {_csrf_token: csrfToken}
-// })
+// Add these imports
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
-// Show progress bar on live navigation and form submits
-// topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
-// window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
-// window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
+// LiveSocket setup - REMOVED/COMMENTED
+/*
+let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+let liveSocket = new LiveSocket("/live", Socket, {
+  longPollFallbackMs: 2500,
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks // Hook config removed
+})
+*/
 
-// connect if there are any LiveViews on the page
-// liveSocket.connect()
+// Topbar setup - REMOVED/COMMENTED (as it was tied to LiveView page loading)
+/*
+topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
+window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
+window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
+*/
 
-// expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
-// >> liveSocket.disableLatencySim()
-// window.liveSocket = liveSocket
+// LiveSocket connection - REMOVED/COMMENTED
+/*
+liveSocket.connect()
+*/
+
+// Expose liveSocket - REMOVED/COMMENTED
+/*
+window.liveSocket = liveSocket
+*/
+
+// Plain JavaScript Markdown Rendering
+document.addEventListener('DOMContentLoaded', () => {
+  const markdownElements = document.querySelectorAll('[data-markdown-source]');
+  markdownElements.forEach(el => {
+    const rawMarkdown = el.dataset.markdownContent;
+    if (rawMarkdown) {
+      const dirtyHtml = marked.parse(rawMarkdown);
+      const cleanHtml = DOMPurify.sanitize(dirtyHtml);
+      el.innerHTML = cleanHtml;
+    }
+  });
+});
 

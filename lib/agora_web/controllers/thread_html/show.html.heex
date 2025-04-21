@@ -8,8 +8,12 @@
   </:actions>
 </.header>
 
-<div class="mt-4 mb-8 text-foreground rounded-lg border bg-card p-4 shadow-sm">
-  {@thread.body}
+<div
+  data-markdown-source
+  data-markdown-content={raw(@thread.body)}
+  class="prose dark:prose-invert max-w-none mt-4 mb-8 text-foreground rounded-lg border bg-card p-4 shadow-sm"
+>
+  <!-- Content will be rendered by JS -->
 </div>
 
 <h3 class="mt-8 mb-4 text-md font-semibold leading-tight text-brand">Post a Comment</h3>
@@ -26,7 +30,14 @@
       <span class="text-sm font-medium text-foreground">{comment.user.username}</span>
       <span class="text-xs text-muted-foreground">({comment.inserted_at})</span>
     </div>
-    <p class="text-foreground">{comment.body}</p>
+    <p
+      data-markdown-source
+      data-markdown-content={raw(comment.body)}
+      class="prose dark:prose-invert max-w-none text-foreground"
+      id={"comment-body-#{comment.id}"}
+    >
+      <!-- Content will be rendered by JS -->
+    </p>
   </div>
   <div :if={@comments == []}>
     <p class="text-muted-foreground">No comments yet.</p>
