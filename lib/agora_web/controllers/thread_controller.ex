@@ -66,34 +66,53 @@ defmodule AgoraWeb.ThreadController do
   end
 
   def edit(conn, %{"id" => id}) do
-    thread = Forum.get_thread!(id)
-    changeset = Forum.change_thread(thread)
-    topics = Forum.list_topics()
-    render(conn, :edit, thread: thread, changeset: changeset, topics: topics)
+    with {:ok, thread} <- authorize_user_owns_thread(conn, id) do
+      changeset = Forum.change_thread(thread)
+      topics = Forum.list_topics()
+      render(conn, :edit, thread: thread, changeset: changeset, topics: topics)
+    end
   end
 
   def update(conn, %{"id" => id, "thread" => thread_params}) do
-    thread = Forum.get_thread!(id)
+    with {:ok, thread} <- authorize_user_owns_thread(conn, id) do
+      case Forum.update_thread(thread, thread_params) do
+        {:ok, thread} ->
+          conn
+          |> put_flash(:info, "Thread updated successfully.")
+          |> redirect(to: ~p"/threads/#{thread}")
 
-    case Forum.update_thread(thread, thread_params) do
-      {:ok, thread} ->
-        conn
-        |> put_flash(:info, "Thread updated successfully.")
-        |> redirect(to: ~p"/threads/#{thread}")
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        # Fetch topics again for re-rendering the form on error
-        topics = Forum.list_topics()
-        render(conn, :edit, thread: thread, changeset: changeset, topics: topics)
+        {:error, %Ecto.Changeset{} = changeset} ->
+          # Fetch topics again for re-rendering the form on error
+          topics = Forum.list_topics()
+          render(conn, :edit, thread: thread, changeset: changeset, topics: topics)
+      end
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    thread = Forum.get_thread!(id)
-    {:ok, _thread} = Forum.delete_thread(thread)
+    with {:ok, thread} <- authorize_user_owns_thread(conn, id) do
+      {:ok, _thread} = Forum.delete_thread(thread)
 
-    conn
-    |> put_flash(:info, "Thread deleted successfully.")
-    |> redirect(to: ~p"/threads")
+      conn
+      |> put_flash(:info, "Thread deleted successfully.")
+      |> redirect(to: ~p"/threads")
+    end
+  end
+
+  # Add this private helper function at the end of the module
+  defp authorize_user_owns_thread(conn, thread_id) do
+    thread = Forum.get_thread!(thread_id)
+
+    if thread.user_id == conn.assigns.current_user.id do
+      {:ok, thread}
+    else
+      conn
+      |> put_flash(:error, "You are not authorized to perform this action.")
+      # Redirect to threads index on failure
+      |> redirect(to: ~p"/threads")
+      |> halt()
+
+      {:error, :unauthorized}
+    end
   end
 end
