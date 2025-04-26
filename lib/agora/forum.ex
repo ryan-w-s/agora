@@ -343,4 +343,18 @@ defmodule Agora.Forum do
     |> preload(:user)
     |> Repo.all()
   end
+
+  @doc """
+  Returns the list of top-level topics (those without a parent).
+
+  ## Examples
+
+      iex> list_top_level_topics()
+      [%Topic{parent_topic_id: nil}, ...]
+
+  """
+  def list_top_level_topics do
+    from(t in Topic, where: is_nil(t.parent_topic_id))
+    |> Repo.all()
+  end
 end

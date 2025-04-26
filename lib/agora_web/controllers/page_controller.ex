@@ -1,9 +1,12 @@
 defmodule AgoraWeb.PageController do
   use AgoraWeb, :controller
 
+  alias Agora.Forum
+
   def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home, layout: false)
+    # Fetch only top-level topics
+    topics = Forum.list_top_level_topics()
+    # Render with the default app layout
+    render(conn, :home, topics: topics)
   end
 end

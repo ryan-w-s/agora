@@ -101,6 +101,22 @@ defmodule Agora.ForumTest do
       topic = topic_fixture()
       assert %Ecto.Changeset{} = Forum.change_topic(topic)
     end
+
+    test "list_top_level_topics/0 returns only topics without parents" do
+      parent_topic = topic_fixture()
+      # Child topic linked to the parent
+      _child_topic = topic_fixture(%{parent_topic_id: parent_topic.id})
+      # Another independent top-level topic
+      other_top_level_topic = topic_fixture()
+
+      top_level_topics = Forum.list_top_level_topics()
+
+      assert length(top_level_topics) == 2
+      assert Enum.any?(top_level_topics, &(&1.id == parent_topic.id))
+      assert Enum.any?(top_level_topics, &(&1.id == other_top_level_topic.id))
+      # Ensure child_topic is NOT in the list
+      refute Enum.any?(top_level_topics, &(&1.parent_topic_id == parent_topic.id))
+    end
   end
 
   describe "threads" do
