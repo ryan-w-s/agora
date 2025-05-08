@@ -12,9 +12,11 @@
   <:col :let={topic} label="Name">
     <span class="font-semibold text-primary hover:underline">{topic.name}</span>
   </:col>
+  
   <:col :let={topic} label="Description">
     {topic.description}
   </:col>
+  
   <:action :let={topic}>
     <.link navigate={~p"/topics/#{topic}"} class="text-sm font-semibold">View</.link>
   </:action>
