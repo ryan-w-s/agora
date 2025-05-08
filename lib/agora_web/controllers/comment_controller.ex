@@ -2,29 +2,120 @@ defmodule AgoraWeb.CommentController do
   use AgoraWeb, :controller
 
   alias Agora.Forum
-  # alias Agora.Forum.Comment # Removed unused alias
+  # alias Agora.Forum.Comment
 
-  def create(conn, %{"thread_id" => thread_id, "comment" => comment_params}) do
+  def create(conn, %{"thread_id" => _thread_id, "comment" => comment_params}) do
     user = conn.assigns.current_user
 
     # Add user_id and thread_id to the comment parameters
+    # The thread_id from params is still used here to associate the comment
+    # Keep original for association if needed
+    original_thread_id = conn.params["thread_id"]
     comment_params = Map.put(comment_params, "user_id", user.id)
-    comment_params = Map.put(comment_params, "thread_id", thread_id)
+    comment_params = Map.put(comment_params, "thread_id", original_thread_id)
 
     case Forum.create_comment(comment_params) do
-      {:ok, _comment} ->
+      {:ok, comment} ->
         conn
         |> put_flash(:info, "Comment posted successfully.")
-        |> redirect(to: ~p"/threads/#{thread_id}")
+        # Use comment.thread_id from the created record
+        |> redirect(to: ~p"/threads/#{comment.thread_id}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
         # If there's an error, redirect back to the thread page.
         # We'll display the error using flash messages.
-        # We need to pass the changeset errors back somehow, maybe via flash?
-        # For now, just redirecting with a generic error flash.
+        thread_id_for_redirect =
+          case comment_params["thread_id"] do
+            nil ->
+              # Fallback, though thread_id should always be present for comment creation
+              # This could happen if comment_params is unexpectedly empty or malformed.
+              # Consider how to handle this scenario, perhaps redirect to home or an error page.
+              # For now, attempting to get it from the conn params as a last resort.
+              conn.params["thread_id"]
+
+            id ->
+              id
+          end
+
         conn
         |> put_flash(:error, "Could not post comment. #{inspect(changeset.errors)}")
-        |> redirect(to: ~p"/threads/#{thread_id}")
+        |> redirect(to: ~p"/threads/#{thread_id_for_redirect}")
+    end
+  end
+
+  def edit(conn, %{"thread_id" => thread_id, "id" => id}) do
+    # Ensure thread_id is an integer if it comes as a string
+    thread_id_int = String.to_integer(thread_id)
+
+    with {:ok, comment} <- authorize_user_owns_comment_or_is_moderator(conn, id) do
+      changeset = Forum.change_comment(comment)
+      # Pass thread_id to the template, ensuring it's the integer version
+      render(conn, :edit, comment: comment, changeset: changeset, thread_id: thread_id_int)
+    end
+  end
+
+  def update(conn, %{"thread_id" => thread_id, "id" => id, "comment" => comment_params}) do
+    # Ensure thread_id is an integer
+    thread_id_int = String.to_integer(thread_id)
+
+    with {:ok, comment} <- authorize_user_owns_comment_or_is_moderator(conn, id) do
+      case Forum.update_comment(comment, comment_params) do
+        {:ok, updated_comment} ->
+          conn
+          |> put_flash(:info, "Comment updated successfully.")
+          # Use updated_comment.thread_id
+          |> redirect(to: ~p"/threads/#{updated_comment.thread_id}")
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          render(conn, :edit,
+            comment: comment,
+            changeset: changeset,
+            # Pass integer thread_id
+            thread_id: thread_id_int
+          )
+      end
+    end
+  end
+
+  def delete(conn, %{"thread_id" => thread_id, "id" => id}) do
+    # Ensure thread_id is an integer
+    thread_id_int = String.to_integer(thread_id)
+
+    with {:ok, comment} <- authorize_user_owns_comment_or_is_moderator(conn, id) do
+      {:ok, _deleted_comment} = Forum.delete_comment(comment)
+
+      conn
+      |> put_flash(:info, "Comment deleted successfully.")
+      # Use integer thread_id for redirect
+      |> redirect(to: ~p"/threads/#{thread_id_int}")
+    end
+  end
+
+  defp authorize_user_owns_comment_or_is_moderator(conn, comment_id) do
+    # Preload thread
+    comment = Forum.get_comment!(comment_id) |> Agora.Repo.preload(:thread)
+    current_user = conn.assigns.current_user
+
+    # Ensure comment and comment.thread exist before trying to access comment.thread.id
+    if !is_nil(comment) && !is_nil(comment.thread) &&
+         (comment.user_id == current_user.id || current_user.is_moderator) do
+      {:ok, comment}
+    else
+      # Attempt to get thread_id for redirect, fallback to a default if not available
+      thread_id_for_redirect =
+        cond do
+          !is_nil(comment) && !is_nil(comment.thread) -> comment.thread.id
+          !is_nil(conn.params["thread_id"]) -> conn.params["thread_id"]
+          # Fallback to root or a generic error page might be better
+          true -> ""
+        end
+
+      conn
+      |> put_flash(:error, "You are not authorized to perform this action.")
+      |> redirect(to: ~p"/threads/#{thread_id_for_redirect}")
+      |> halt()
+
+      {:error, :unauthorized}
     end
   end
 end

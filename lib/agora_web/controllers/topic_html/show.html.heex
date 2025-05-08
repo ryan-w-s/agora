@@ -34,15 +34,21 @@
   </:actions>
 </.header>
 
-<.table :if={@topic.threads != []} id="threads" rows={@topic.threads}>
-  <:col :let={thread} label="Title">{thread.title}</:col>
-  <:col :let={thread} label="Author">{thread.user.username}</:col>
+<.table
+  :if={@topic.threads != []}
+  id="threads"
+  rows={@topic.threads}
+  row_click={&JS.navigate(~p"/threads/#{&1}")}
+>
+  <:col :let={thread} label="Title">
+    <.link navigate={~p"/threads/#{thread}"}>{thread.title}</.link>
+  </:col>
+  <:col :let={thread} label="Author">
+    <.link navigate={~p"/users/#{thread.user.username}"}>{thread.user.username}</.link>
+  </:col>
   <:col :let={thread} label="Last Updated">
     {thread.updated_at}
   </:col>
-  <:action :let={thread}>
-    <.link navigate={~p"/threads/#{thread}"}>View</.link>
-  </:action>
 </.table>
 
 <p :if={@topic.threads == []}>This topic has no threads yet.</p>

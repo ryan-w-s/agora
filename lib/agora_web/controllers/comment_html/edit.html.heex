@@ -1,0 +1,14 @@
+<.header>
+  Edit Comment
+  <:subtitle>You are editing your comment.</:subtitle>
+</.header>
+
+<.comment_form
+  changeset={@changeset}
+  action={~p"/threads/#{@thread_id}/comments/#{@comment}"}
+  thread_id={@thread_id}
+  comment={@comment}
+/>
+<.link href={~p"/threads/#{@thread_id}"} class="mt-4 block">
+  <.icon name="hero-arrow-left-solid" class="h-3 w-3" /> Back to Thread
+</.link>

@@ -124,6 +124,15 @@ defmodule Agora.Accounts.User do
   end
 
   @doc """
+  A changeset for updating the moderator status of a user.
+  """
+  def moderator_status_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:is_moderator])
+    |> validate_required([:is_moderator])
+  end
+
+  @doc """
   A user changeset for changing the email.
 
   It requires the email to change otherwise an error is added.

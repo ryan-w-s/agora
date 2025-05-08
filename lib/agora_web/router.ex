@@ -24,8 +24,12 @@ defmodule AgoraWeb.Router do
     resources "/topics", TopicController
 
     resources "/threads", ThreadController do
-      resources "/comments", CommentController, only: [:create]
+      resources "/comments", CommentController, only: [:create, :edit, :update, :delete]
     end
+
+    # User profiles -- MOVED FROM HERE
+    # get "/users/:id", UserController, :show
+    # post "/users/:id/set_moderator_status", UserController, :set_moderator_status
   end
 
   # Other scopes may use custom stacks.
@@ -81,5 +85,9 @@ defmodule AgoraWeb.Router do
     post "/users/confirm", UserConfirmationController, :create
     get "/users/confirm/:token", UserConfirmationController, :edit
     post "/users/confirm/:token", UserConfirmationController, :update
+
+    # User profiles -- MOVED TO HERE (ensure they are after specific /users/... routes)
+    get "/users/:id", UserController, :show
+    post "/users/:id/set_moderator_status", UserController, :set_moderator_status
   end
 end

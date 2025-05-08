@@ -27,6 +27,43 @@ defmodule Agora.Accounts do
   end
 
   @doc """
+  Gets a user by username.
+
+  ## Examples
+
+      iex> get_user_by_username("myuser")
+      %User{}
+
+      iex> get_user_by_username("unknownuser")
+      nil
+
+  """
+  def get_user_by_username(username) when is_binary(username) do
+    Repo.get_by(User, username: username)
+  end
+
+  @doc """
+  Gets a user by email or username.
+
+  Tries to find a user by email first. If not found, tries by username.
+
+  ## Examples
+
+      iex> get_user_by_identifier("foo@example.com")
+      %User{}
+
+      iex> get_user_by_identifier("myuser")
+      %User{}
+
+      iex> get_user_by_identifier("nonexistent")
+      nil
+  """
+  def get_user_by_identifier(identifier) when is_binary(identifier) do
+    # Only allow lookup by username for public identifiers
+    get_user_by_username(identifier)
+  end
+
+  @doc """
   Gets a user by email and password.
 
   ## Examples
@@ -188,6 +225,22 @@ defmodule Agora.Accounts do
   end
 
   @doc """
+  Returns an `%Ecto.Changeset{}` for changing the user profile.
+
+  ## Examples
+
+      iex> change_user_profile(user)
+      %Ecto.Changeset{data: %User{}}
+
+      iex> change_user_profile(user, %{bio: "New bio"})
+      %Ecto.Changeset{data: %User{}, changes: %{bio: "New bio"}}
+
+  """
+  def change_user_profile(%User{} = user, attrs \\ %{}) do
+    User.profile_changeset(user, attrs)
+  end
+
+  @doc """
   Updates the user password.
 
   ## Examples
@@ -213,6 +266,23 @@ defmodule Agora.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  @doc """
+  Updates the user profile information (e.g., bio, signature).
+
+  ## Examples
+
+      iex> update_user_profile(user, %{bio: "A new bio"})
+      {:ok, %User{}}
+
+      iex> update_user_profile(user, %{bio: String.duplicate("a", 6000)})
+      {:error, %Ecto.Changeset{}}
+  """
+  def update_user_profile(%User{} = user, attrs) do
+    user
+    |> User.profile_changeset(attrs)
+    |> Repo.update()
   end
 
   ## Session

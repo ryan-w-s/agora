@@ -45,6 +45,29 @@ register_or_get_user.(%{
   password: password
 })
 
+IO.puts("\\nSetting Alice as moderator...")
+alice = Agora.Accounts.get_user_by_email("alice@example.com")
+
+if alice && !alice.is_moderator do
+  changeset = Agora.Accounts.User.moderator_status_changeset(alice, %{is_moderator: true})
+
+  case Agora.Repo.update(changeset) do
+    {:ok, updated_alice} ->
+      IO.puts(
+        "User \"#{updated_alice.username}\" has been updated to moderator: #{updated_alice.is_moderator}"
+      )
+
+    {:error, failed_changeset} ->
+      IO.puts("Failed to update Alice to moderator: #{inspect(failed_changeset.errors)}")
+  end
+else
+  if alice && alice.is_moderator do
+    IO.puts("Alice is already a moderator.")
+  else
+    IO.puts("Could not find Alice to set as moderator.")
+  end
+end
+
 IO.puts("\\nSeeding topics...")
 
 # Parent topics

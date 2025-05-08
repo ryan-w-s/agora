@@ -4,7 +4,7 @@ defmodule AgoraWeb.UserSettingsController do
   alias Agora.Accounts
   alias AgoraWeb.UserAuth
 
-  plug :assign_email_and_password_changesets
+  plug :assign_form_changesets
 
   def edit(conn, _params) do
     render(conn, :edit)
@@ -50,6 +50,21 @@ defmodule AgoraWeb.UserSettingsController do
     end
   end
 
+  def update(conn, %{"action" => "update_profile"} = params) do
+    %{"user" => profile_params} = params
+    user = conn.assigns.current_user
+
+    case Accounts.update_user_profile(user, profile_params) do
+      {:ok, _updated_user} ->
+        conn
+        |> put_flash(:info, "Profile updated successfully.")
+        |> redirect(to: ~p"/users/settings")
+
+      {:error, changeset} ->
+        render(conn, :edit, profile_changeset: changeset)
+    end
+  end
+
   def confirm_email(conn, %{"token" => token}) do
     case Accounts.update_user_email(conn.assigns.current_user, token) do
       :ok ->
@@ -64,11 +79,12 @@ defmodule AgoraWeb.UserSettingsController do
     end
   end
 
-  defp assign_email_and_password_changesets(conn, _opts) do
+  defp assign_form_changesets(conn, _opts) do
     user = conn.assigns.current_user
 
     conn
     |> assign(:email_changeset, Accounts.change_user_email(user))
     |> assign(:password_changeset, Accounts.change_user_password(user))
+    |> assign(:profile_changeset, Accounts.change_user_profile(user))
   end
 end

@@ -102,8 +102,9 @@ defmodule AgoraWeb.ThreadController do
   # Add this private helper function at the end of the module
   defp authorize_user_owns_thread(conn, thread_id) do
     thread = Forum.get_thread!(thread_id)
+    current_user = conn.assigns.current_user
 
-    if thread.user_id == conn.assigns.current_user.id do
+    if thread.user_id == current_user.id or current_user.is_moderator do
       {:ok, thread}
     else
       conn

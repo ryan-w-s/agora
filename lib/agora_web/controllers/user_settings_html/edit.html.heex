@@ -60,4 +60,32 @@
       </:actions>
     </.simple_form>
   </div>
+
+  <div>
+    <h2 class="text-lg font-semibold text-foreground mt-8">Profile Settings</h2>
+    <.simple_form
+      :let={f}
+      for={@profile_changeset}
+      action={~p"/users/settings"}
+      id="update_profile"
+    >
+      <.error :if={@profile_changeset.action}>
+        Oops, something went wrong! Please check the errors below.
+      </.error>
+
+      <input type="hidden" name="action" value="update_profile" />
+
+      <.input
+        field={f[:bio]}
+        type="textarea"
+        label="Bio"
+        rows="6"
+        placeholder="Tell us a little about yourself... Markdown is supported."
+      />
+
+      <:actions>
+        <.button phx-disable-with="Saving...">Save Profile</.button>
+      </:actions>
+    </.simple_form>
+  </div>
 </div>

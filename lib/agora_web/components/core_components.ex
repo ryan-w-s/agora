@@ -231,24 +231,65 @@ defmodule AgoraWeb.CoreComponents do
   """
   attr :type, :string, default: nil
   attr :class, :string, default: nil
+  attr :variant, :atom, values: [:solid, :outline], default: :solid
+  attr :color, :atom, values: [:primary, :secondary, :green, :red, :zinc], default: :primary
   attr :rest, :global, include: ~w(disabled form name value)
 
   slot :inner_block, required: true
 
   def button(assigns) do
     ~H"""
-    <button
-      type={@type}
-      class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-primary hover:bg-primary/90 py-2 px-3",
-        "text-sm font-semibold leading-6 text-primary-foreground active:opacity-80",
-        @class
-      ]}
-      {@rest}
-    >
+    <button type={@type} class={build_button_classes(assigns)} {@rest}>
       {render_slot(@inner_block)}
     </button>
     """
+  end
+
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  defp build_button_classes(assigns) do
+    base_classes = "rounded-lg py-2 px-3 text-sm font-semibold leading-6 active:opacity-80"
+    loading_classes = "phx-submit-loading:opacity-75"
+
+    variant_classes =
+      case assigns.variant do
+        :solid ->
+          solid_color_classes =
+            case assigns.color do
+              :primary -> "bg-primary hover:bg-primary/90 text-primary-foreground"
+              :secondary -> "bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+              :green -> "bg-green-600 hover:bg-green-700 text-white"
+              :red -> "bg-red-600 hover:bg-red-700 text-white"
+              :zinc -> "bg-zinc-600 hover:bg-zinc-700 text-white"
+            end
+
+          [solid_color_classes]
+
+        :outline ->
+          outline_color_classes =
+            case assigns.color do
+              :primary ->
+                "border-primary text-primary hover:bg-primary/10"
+
+              :secondary ->
+                "border-secondary text-secondary hover:bg-secondary/10"
+
+              :green ->
+                "border-green-500 text-green-600 hover:bg-green-500/10 dark:border-green-600 dark:text-green-500 dark:hover:bg-green-600/10"
+
+              :red ->
+                "border-red-500 text-red-600 hover:bg-red-500/10 dark:border-red-600 dark:text-red-500 dark:hover:bg-red-600/10"
+
+              :zinc ->
+                "border-zinc-500 text-zinc-600 hover:bg-zinc-500/10 dark:border-zinc-400 dark:text-zinc-300 dark:hover:bg-zinc-700/20"
+            end
+
+          ["border-2", outline_color_classes]
+      end
+
+    [base_classes, loading_classes, variant_classes, assigns.class]
+    |> List.flatten()
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(" ")
   end
 
   @doc """
@@ -694,16 +735,6 @@ defmodule AgoraWeb.CoreComponents do
   Translates an error message using gettext.
   """
   def translate_error({msg, opts}) do
-    # When using gettext, we typically pass the strings we want
-    # to translate as a static argument:
-    #
-    #     # Translate the number of files with plural rules
-    #     dngettext("errors", "1 file", "%{count} files", count)
-    #
-    # However the error messages in our forms and APIs are generated
-    # dynamically, so we need to translate them by calling Gettext
-    # with our gettext backend as first argument. Translations are
-    # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
       Gettext.dngettext(AgoraWeb.Gettext, "errors", msg, msg, count, opts)
     else

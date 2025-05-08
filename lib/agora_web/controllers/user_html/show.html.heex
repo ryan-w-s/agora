@@ -1,0 +1,104 @@
+<.header>
+  Profile: {@user.username}
+  <:subtitle>
+    Member since {Timex.format!(@user.inserted_at, "{Mfull} {D}, {YYYY}")}
+  </:subtitle>
+</.header>
+
+<div class="mt-6 border-t border-zinc-700/40 dark:border-zinc-200/10">
+  <dl class="divide-y divide-zinc-700/40 dark:divide-zinc-200/10">
+    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+      <dt class="text-sm font-medium leading-6 text-foreground">Username</dt>
+
+      <dd class="mt-1 text-sm leading-6 text-muted-foreground sm:col-span-2 sm:mt-0">
+        {@user.username}
+      </dd>
+    </div>
+
+    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+      <dt class="text-sm font-medium leading-6 text-foreground">Email</dt>
+
+      <dd class="mt-1 text-sm leading-6 text-muted-foreground sm:col-span-2 sm:mt-0">
+        {@user.email}
+      </dd>
+    </div>
+
+    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+      <dt class="text-sm font-medium leading-6 text-foreground">Bio</dt>
+
+      <dd class="mt-1 text-sm leading-6 text-muted-foreground sm:col-span-2 sm:mt-0">
+        <div
+          :if={@user.bio && String.trim(@user.bio) != ""}
+          data-markdown-source
+          data-markdown-content={@user.bio}
+          class="prose dark:prose-invert max-w-none"
+        >
+          <!-- Content will be rendered by JS -->
+        </div>
+        <span :if={!@user.bio || String.trim(@user.bio) == ""}>No bio provided.</span>
+      </dd>
+    </div>
+
+    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+      <dt class="text-sm font-medium leading-6 text-foreground">Moderator Status</dt>
+
+      <dd class="mt-1 text-sm leading-6 text-muted-foreground sm:col-span-2 sm:mt-0">
+        <span class={
+          if @user.is_moderator, do: "font-semibold text-green-400", else: "text-red-400"
+        }>
+          {if @user.is_moderator, do: "Moderator", else: "Regular User"}
+        </span>
+      </dd>
+    </div>
+    
+<!-- Moderator Actions -->
+    <div
+      :if={@current_user && @current_user.is_moderator && @current_user.id != @user.id}
+      class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0"
+    >
+      <dt class="text-sm font-medium leading-6 text-foreground">Admin Actions</dt>
+
+      <dd class="mt-1 text-sm leading-6 text-muted-foreground sm:col-span-2 sm:mt-0">
+        <div :if={!@user.is_moderator}>
+          <.link
+            href={~p"/users/#{@user.id}/set_moderator_status?status=true"}
+            method="post"
+            data-confirm={"Are you sure you want to promote #{@user.username} to moderator?"}
+          >
+            <.button variant={:outline} color={:green}>Promote to Moderator</.button>
+          </.link>
+        </div>
+
+        <div :if={@user.is_moderator}>
+          <.link
+            href={~p"/users/#{@user.id}/set_moderator_status?status=false"}
+            method="post"
+            data-confirm={"Are you sure you want to demote #{@user.username} from moderator?"}
+          >
+            <.button variant={:outline} color={:red}>Demote from Moderator</.button>
+          </.link>
+        </div>
+      </dd>
+    </div>
+  </dl>
+</div>
+
+<h3 class="mt-8 mb-4 text-md font-semibold leading-tight text-brand">
+  Recent Activity (Placeholder)
+</h3>
+
+<div :if={@recent_activity == []}>
+  <p class="text-muted-foreground">No recent activity to display.</p>
+</div>
+
+<!-- Placeholder for actual recent activity listing -->
+<ul :if={@recent_activity != []}>
+  <li :for={activity <- @recent_activity}>{activity}</li>
+</ul>
+
+<.link
+  href={~p"/"}
+  class="mt-8 block text-sm font-semibold leading-6 text-foreground hover:text-muted-foreground"
+>
+  <.icon name="hero-arrow-left-solid" class="h-3 w-3" /> Back to Home
+</.link>

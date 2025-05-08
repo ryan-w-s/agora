@@ -12,15 +12,4 @@
     <.link navigate={~p"/threads/#{thread}"}>{thread.title}</.link>
   </:col>
   <:col :let={thread} label="Body">{thread.body}</:col>
-  <:action :let={thread}>
-    <div class="sr-only">
-      <.link navigate={~p"/threads/#{thread}"}>Show</.link>
-    </div>
-    <.link navigate={~p"/threads/#{thread}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={thread}>
-    <.link href={~p"/threads/#{thread}"} method="delete" data-confirm="Are you sure?">
-      Delete
-    </.link>
-  </:action>
 </.table>
