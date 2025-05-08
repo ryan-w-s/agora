@@ -11,8 +11,13 @@
     <nav class="flex items-center gap-4 text-sm">
       <%= if @current_user do %>
         <ul class="flex items-center gap-4">
-          <li class="leading-6 text-muted-foreground">
-            {@current_user.username}
+          <li>
+            <.link
+              href={~p"/users/#{@current_user.username}"}
+              class="leading-6 text-muted-foreground hover:text-foreground"
+            >
+              {@current_user.username}
+            </.link>
           </li>
           <li>
             <.link
