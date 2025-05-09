@@ -11,17 +11,31 @@ defmodule AgoraWeb.ThreadController do
   end
 
   def new(conn, %{"topic_id" => topic_id_str} = _params) do
-    # Parse topic_id to integer
-    topic_id = String.to_integer(topic_id_str)
-    changeset = Forum.change_thread(%Thread{topic_id: topic_id})
-    topics = Forum.list_topics()
-    render(conn, :new, changeset: changeset, topic_id: topic_id, topics: topics)
+    if is_nil(conn.assigns.current_user) do
+      conn
+      |> put_flash(:error, "You must be logged in to create a new thread.")
+      |> redirect(to: ~p"/users/log_in")
+      |> halt()
+    else
+      # Parse topic_id to integer
+      topic_id = String.to_integer(topic_id_str)
+      changeset = Forum.change_thread(%Thread{topic_id: topic_id})
+      topics = Forum.list_topics()
+      render(conn, :new, changeset: changeset, topic_id: topic_id, topics: topics)
+    end
   end
 
   def new(conn, _params) do
-    changeset = Forum.change_thread(%Thread{})
-    topics = Forum.list_topics()
-    render(conn, :new, changeset: changeset, topic_id: nil, topics: topics)
+    if is_nil(conn.assigns.current_user) do
+      conn
+      |> put_flash(:error, "You must be logged in to create a new thread.")
+      |> redirect(to: ~p"/users/log_in")
+      |> halt()
+    else
+      changeset = Forum.change_thread(%Thread{})
+      topics = Forum.list_topics()
+      render(conn, :new, changeset: changeset, topic_id: nil, topics: topics)
+    end
   end
 
   def create(conn, %{"thread" => thread_params}) do
