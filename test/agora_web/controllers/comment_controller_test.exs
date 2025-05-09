@@ -76,7 +76,12 @@ defmodule AgoraWeb.CommentControllerTest do
   describe "edit comment" do
     setup [:create_test_data]
 
-    test "user can access edit form for their own comment", %{conn: conn, user: user, thread: thread, comment: comment} do
+    test "user can access edit form for their own comment", %{
+      conn: conn,
+      user: user,
+      thread: thread,
+      comment: comment
+    } do
       conn =
         conn
         |> log_in_user(user)
@@ -86,7 +91,11 @@ defmodule AgoraWeb.CommentControllerTest do
       assert html_response(conn, 200) =~ "Original comment"
     end
 
-    test "moderator can access edit form for any comment", %{conn: conn, thread: thread, comment: comment} do
+    test "moderator can access edit form for any comment", %{
+      conn: conn,
+      thread: thread,
+      comment: comment
+    } do
       moderator = moderator_fixture()
 
       conn =
@@ -97,7 +106,11 @@ defmodule AgoraWeb.CommentControllerTest do
       assert html_response(conn, 200) =~ "Edit Comment"
     end
 
-    test "regular user cannot access edit form for another user's comment", %{conn: conn, thread: thread, comment: comment} do
+    test "regular user cannot access edit form for another user's comment", %{
+      conn: conn,
+      thread: thread,
+      comment: comment
+    } do
       other_user = user_fixture()
 
       conn =
@@ -106,14 +119,19 @@ defmodule AgoraWeb.CommentControllerTest do
         |> get(~p"/threads/#{thread.id}/comments/#{comment.id}/edit")
 
       assert redirected_to(conn) == ~p"/threads/#{thread.id}"
-      assert get_flash(conn, :error) =~ "not authorized"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "not authorized"
     end
   end
 
   describe "update comment" do
     setup [:create_test_data]
 
-    test "user can update their own comment", %{conn: conn, user: user, thread: thread, comment: comment} do
+    test "user can update their own comment", %{
+      conn: conn,
+      user: user,
+      thread: thread,
+      comment: comment
+    } do
       conn =
         conn
         |> log_in_user(user)
@@ -122,7 +140,7 @@ defmodule AgoraWeb.CommentControllerTest do
         })
 
       assert redirected_to(conn) == ~p"/threads/#{thread.id}"
-      assert get_flash(conn, :info) =~ "updated successfully"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "updated successfully"
 
       # Verify the update in the database
       updated_comment = Forum.get_comment!(comment.id)
@@ -146,7 +164,11 @@ defmodule AgoraWeb.CommentControllerTest do
       assert updated_comment.body == "Moderator edited this"
     end
 
-    test "regular user cannot update another user's comment", %{conn: conn, thread: thread, comment: comment} do
+    test "regular user cannot update another user's comment", %{
+      conn: conn,
+      thread: thread,
+      comment: comment
+    } do
       other_user = user_fixture()
 
       conn =
@@ -157,7 +179,7 @@ defmodule AgoraWeb.CommentControllerTest do
         })
 
       assert redirected_to(conn) == ~p"/threads/#{thread.id}"
-      assert get_flash(conn, :error) =~ "not authorized"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "not authorized"
 
       # Verify no changes in the database
       unchanged_comment = Forum.get_comment!(comment.id)
@@ -168,14 +190,19 @@ defmodule AgoraWeb.CommentControllerTest do
   describe "delete comment" do
     setup [:create_test_data]
 
-    test "user can delete their own comment", %{conn: conn, user: user, thread: thread, comment: comment} do
+    test "user can delete their own comment", %{
+      conn: conn,
+      user: user,
+      thread: thread,
+      comment: comment
+    } do
       conn =
         conn
         |> log_in_user(user)
         |> delete(~p"/threads/#{thread.id}/comments/#{comment.id}")
 
       assert redirected_to(conn) == ~p"/threads/#{thread.id}"
-      assert get_flash(conn, :info) =~ "deleted successfully"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "deleted successfully"
 
       # Verify deletion
       assert_raise Ecto.NoResultsError, fn ->
@@ -199,7 +226,11 @@ defmodule AgoraWeb.CommentControllerTest do
       end
     end
 
-    test "regular user cannot delete another user's comment", %{conn: conn, thread: thread, comment: comment} do
+    test "regular user cannot delete another user's comment", %{
+      conn: conn,
+      thread: thread,
+      comment: comment
+    } do
       other_user = user_fixture()
 
       conn =
@@ -208,7 +239,7 @@ defmodule AgoraWeb.CommentControllerTest do
         |> delete(~p"/threads/#{thread.id}/comments/#{comment.id}")
 
       assert redirected_to(conn) == ~p"/threads/#{thread.id}"
-      assert get_flash(conn, :error) =~ "not authorized"
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) =~ "not authorized"
 
       # Verify comment still exists
       still_exists = Forum.get_comment!(comment.id)
