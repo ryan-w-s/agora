@@ -91,29 +91,43 @@ defmodule AgoraWeb.ThreadController do
 
   def delete(conn, %{"id" => id}) do
     with {:ok, thread} <- authorize_user_owns_thread(conn, id) do
-      {:ok, _thread} = Forum.delete_thread(thread)
+      # The thread variable from the with statement already has topic_id loaded
+      # because authorize_user_owns_thread calls Forum.get_thread! which should preload it
+      # or have it available. We can directly use thread.topic_id here.
+      original_topic_id = thread.topic_id
+      {:ok, _deleted_thread} = Forum.delete_thread(thread)
 
       conn
       |> put_flash(:info, "Thread deleted successfully.")
-      |> redirect(to: ~p"/threads")
+      |> redirect(to: ~p"/topics/#{original_topic_id}")
     end
   end
 
   # Add this private helper function at the end of the module
   defp authorize_user_owns_thread(conn, thread_id) do
-    thread = Forum.get_thread!(thread_id)
     current_user = conn.assigns.current_user
 
-    if thread.user_id == current_user.id or current_user.is_moderator do
-      {:ok, thread}
-    else
+    if is_nil(current_user) do
       conn
-      |> put_flash(:error, "You are not authorized to perform this action.")
-      # Redirect to threads index on failure
-      |> redirect(to: ~p"/threads")
+      |> put_flash(:error, "You must be logged in to perform this action.")
+      |> redirect(to: ~p"/users/log_in")
       |> halt()
 
       {:error, :unauthorized}
+    else
+      thread = Forum.get_thread!(thread_id)
+
+      if thread.user_id == current_user.id or current_user.is_moderator do
+        {:ok, thread}
+      else
+        conn
+        |> put_flash(:error, "You are not authorized to perform this action.")
+        # Redirect to threads index on failure
+        |> redirect(to: ~p"/threads")
+        |> halt()
+
+        {:error, :unauthorized}
+      end
     end
   end
 end
