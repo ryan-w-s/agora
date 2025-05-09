@@ -1,6 +1,12 @@
 <.header>
   {@thread.title}
-  <:subtitle>Posted by {@thread.user.username} on {@thread.inserted_at}</:subtitle>
+  <:subtitle>
+    Posted by
+    <.link navigate={~p"/users/#{@thread.user.username}"} class="link">
+      {@thread.user.username}
+    </.link>
+    on {@thread.inserted_at}
+  </:subtitle>
   <:actions>
     <.link href={~p"/threads/#{@thread}/edit"}>
       <.button>Edit thread</.button>
@@ -28,7 +34,9 @@
     <div class="mb-2 flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <.icon name="hero-user-circle" class="h-5 w-5 text-muted-foreground" />
-        <span class="text-sm font-medium text-foreground">{comment.user.username}</span>
+        <.link navigate={~p"/users/#{comment.user.username}"} class="link">
+          <span class="text-sm font-medium text-foreground">{comment.user.username}</span>
+        </.link>
         <span class="text-xs text-muted-foreground">({comment.inserted_at})</span>
       </div>
       <div

@@ -61,7 +61,7 @@
       <dd class="mt-1 text-sm leading-6 text-muted-foreground sm:col-span-2 sm:mt-0">
         <div :if={!@user.is_moderator}>
           <.link
-            href={~p"/users/#{@user.id}/set_moderator_status?status=true"}
+            href={~p"/users/#{@user.username}/set_moderator_status?status=true"}
             method="post"
             data-confirm={"Are you sure you want to promote #{@user.username} to moderator?"}
           >
@@ -71,7 +71,7 @@
 
         <div :if={@user.is_moderator}>
           <.link
-            href={~p"/users/#{@user.id}/set_moderator_status?status=false"}
+            href={~p"/users/#{@user.username}/set_moderator_status?status=false"}
             method="post"
             data-confirm={"Are you sure you want to demote #{@user.username} from moderator?"}
           >

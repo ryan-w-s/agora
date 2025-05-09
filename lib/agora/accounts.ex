@@ -59,8 +59,11 @@ defmodule Agora.Accounts do
       nil
   """
   def get_user_by_identifier(identifier) when is_binary(identifier) do
-    # Only allow lookup by username for public identifiers
-    get_user_by_username(identifier)
+    # Lookup by email first, then by username
+    case get_user_by_email(identifier) do
+      nil -> get_user_by_username(identifier)
+      user -> user
+    end
   end
 
   @doc """

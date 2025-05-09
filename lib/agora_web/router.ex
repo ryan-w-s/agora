@@ -87,7 +87,7 @@ defmodule AgoraWeb.Router do
     post "/users/confirm/:token", UserConfirmationController, :update
 
     # User profiles -- MOVED TO HERE (ensure they are after specific /users/... routes)
-    get "/users/:id", UserController, :show
-    post "/users/:id/set_moderator_status", UserController, :set_moderator_status
+    get "/users/:username_identifier", UserController, :show
+    post "/users/:username_identifier/set_moderator_status", UserController, :set_moderator_status
   end
 end
