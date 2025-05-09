@@ -96,7 +96,6 @@ defmodule AgoraWeb.CommentController do
     comment = Forum.get_comment!(comment_id) |> Agora.Repo.preload(:thread)
     current_user = conn.assigns.current_user
 
-    # Ensure comment and comment.thread exist before trying to access comment.thread.id
     if !is_nil(comment) && !is_nil(comment.thread) &&
          (comment.user_id == current_user.id || current_user.is_moderator) do
       {:ok, comment}
@@ -106,16 +105,14 @@ defmodule AgoraWeb.CommentController do
         cond do
           !is_nil(comment) && !is_nil(comment.thread) -> comment.thread.id
           !is_nil(conn.params["thread_id"]) -> conn.params["thread_id"]
-          # Fallback to root or a generic error page might be better
           true -> ""
         end
 
+      # Redirect and halt, then return conn
       conn
       |> put_flash(:error, "You are not authorized to perform this action.")
       |> redirect(to: ~p"/threads/#{thread_id_for_redirect}")
       |> halt()
-
-      {:error, :unauthorized}
     end
   end
 end

@@ -19,6 +19,30 @@ defmodule AgoraWeb.UserControllerTest do
     moderator
   end
 
+  describe "GET /users/:username_identifier - User Profile" do
+    test "can view a user profile by username" do
+      user = user_fixture(%{username: "viewableuser", email: "viewable@example.com"})
+      conn = build_conn() |> get(~p"/users/#{user.username}")
+
+      assert html_response(conn, 200) =~ "Profile: #{user.username}"
+      assert html_response(conn, 200) =~ user.email
+    end
+
+    test "redirects to home page when user not found" do
+      conn = build_conn() |> get(~p"/users/nonexistentuser")
+
+      assert redirected_to(conn) == ~p"/"
+      assert get_flash(conn, :error) =~ "User not found"
+    end
+
+    test "shows moderator status for moderator users" do
+      moderator = moderator_fixture(%{username: "modstatususer"})
+      conn = build_conn() |> get(~p"/users/#{moderator.username}")
+
+      assert html_response(conn, 200) =~ "Moderator"
+    end
+  end
+
   describe "POST /users/:username_identifier/set_moderator_status - debugging" do
     test "debug moderator action" do
       # Create a moderator user
