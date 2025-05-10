@@ -2,6 +2,9 @@
 
 A modern forum service built with Elixir Phoenix 1.17.
 
+![Agora Forum Screenshot](AgoraScreenshot.png)
+
+
 ## Overview
 
 Agora is a modern forum application designed to support nested topics, rich threads, threaded comments, and user profiles.
@@ -33,7 +36,7 @@ Agora is a modern forum application designed to support nested topics, rich thre
 Clone the repository and install dependencies:
 
 ```bash
-git clone <repository_url>
+git clone https://github.com/ryan-w-s/agora.git
 cd agora
 mix setup
 ```
