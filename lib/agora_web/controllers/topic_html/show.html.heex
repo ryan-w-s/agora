@@ -7,9 +7,11 @@
       <.button>Parent: {@topic.parent_topic.name}</.button>
     </.link>
 
-    <.link href={~p"/topics/#{@topic}/edit"}>
-      <.button>Edit topic</.button>
-    </.link>
+    <div :if={@current_user && @current_user.is_moderator}>
+      <.link href={~p"/topics/#{@topic}/edit"}>
+        <.button>Edit topic</.button>
+      </.link>
+    </div>
   </:actions>
 </.header>
 
@@ -28,9 +30,11 @@
 <.header class="mt-6">
   Threads
   <:actions>
-    <.link href={~p"/threads/new?topic_id=#{@topic.id}"}>
-      <.button>New Thread</.button>
-    </.link>
+    <div :if={@current_user}>
+      <.link href={~p"/threads/new?topic_id=#{@topic.id}"}>
+        <.button>New Thread</.button>
+      </.link>
+    </div>
   </:actions>
 </.header>
 

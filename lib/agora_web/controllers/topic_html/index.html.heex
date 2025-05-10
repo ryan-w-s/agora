@@ -1,9 +1,11 @@
 <.header>
   Listing Topics
   <:actions>
-    <.link href={~p"/topics/new"}>
-      <.button>New Topic</.button>
-    </.link>
+    <div :if={@current_user && @current_user.is_moderator}>
+      <.link href={~p"/topics/new"}>
+        <.button>New Topic</.button>
+      </.link>
+    </div>
   </:actions>
 </.header>
 
@@ -16,11 +18,15 @@
     <div class="sr-only">
       <.link navigate={~p"/topics/#{topic}"}>Show</.link>
     </div>
-    <.link navigate={~p"/topics/#{topic}/edit"}>Edit</.link>
+    <div :if={@current_user && @current_user.is_moderator}>
+      <.link navigate={~p"/topics/#{topic}/edit"}>Edit</.link>
+    </div>
   </:action>
   <:action :let={topic}>
-    <.link href={~p"/topics/#{topic}"} method="delete" data-confirm="Are you sure?">
-      Delete
-    </.link>
+    <div :if={@current_user && @current_user.is_moderator}>
+      <.link href={~p"/topics/#{topic}"} method="delete" data-confirm="Are you sure?">
+        Delete
+      </.link>
+    </div>
   </:action>
 </.table>

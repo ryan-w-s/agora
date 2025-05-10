@@ -4,10 +4,12 @@
       <a href="/">
         <img src={~p"/images/logo.svg"} width="36" />
       </a>
+      
       <p class="bg-primary/10 text-primary rounded-full px-2 font-medium leading-6">
         v{Application.spec(:phoenix, :vsn)}
       </p>
     </div>
+    
     <nav class="flex items-center gap-4 text-sm">
       <%= if @current_user do %>
         <ul class="flex items-center gap-4">
@@ -19,6 +21,7 @@
               {@current_user.username}
             </.link>
           </li>
+          
           <li>
             <.link
               href={~p"/users/settings"}
@@ -27,6 +30,7 @@
               Settings
             </.link>
           </li>
+          
           <li>
             <.link
               href={~p"/users/log_out"}
@@ -47,6 +51,7 @@
               Register
             </.link>
           </li>
+          
           <li>
             <.link
               href={~p"/users/log_in"}
@@ -60,9 +65,9 @@
     </nav>
   </div>
 </header>
+
 <main class="px-4 py-20 sm:px-6 lg:px-8 bg-background text-foreground min-h-screen">
   <div class="mx-auto max-w-5xl">
-    <.flash_group flash={@flash} />
-    {@inner_content}
+    <.flash_group flash={@flash} /> {@inner_content}
   </div>
 </main>

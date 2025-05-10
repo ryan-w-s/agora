@@ -31,10 +31,12 @@ defmodule Mix.Tasks.Agora.SetModeratorTest do
 
   test "removes moderator status from a user" do
     user = user_fixture(%{username: "demoteuser", email: "demoteuser@example.com"})
+
     {:ok, user} =
       user
       |> Accounts.User.moderator_status_changeset(%{is_moderator: true})
       |> Agora.Repo.update()
+
     assert user.is_moderator
 
     ExUnit.CaptureIO.capture_io(fn ->
@@ -47,6 +49,7 @@ defmodule Mix.Tasks.Agora.SetModeratorTest do
 
   test "fails with invalid status argument" do
     user = user_fixture()
+
     ExUnit.CaptureIO.capture_io(fn ->
       catch_exit(SetModerator.run([user.username, "invalid"]))
     end)

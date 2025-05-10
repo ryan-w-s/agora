@@ -93,7 +93,7 @@ defmodule AgoraWeb.ThreadControllerTest do
 
     test "deletes chosen thread", %{conn: conn, thread: thread} do
       conn = delete(conn, ~p"/threads/#{thread}")
-      assert redirected_to(conn) == ~p"/threads"
+      assert redirected_to(conn) == ~p"/topics/#{thread.topic_id}"
 
       assert_error_sent 404, fn ->
         get(conn, ~p"/threads/#{thread}")
