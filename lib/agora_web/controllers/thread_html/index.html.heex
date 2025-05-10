@@ -1,9 +1,11 @@
 <.header>
   Listing Threads
   <:actions>
-    <.link href={~p"/threads/new"}>
-      <.button>New Thread</.button>
-    </.link>
+    <div :if={@current_user}>
+      <.link href={~p"/threads/new"}>
+        <.button>New Thread</.button>
+      </.link>
+    </div>
   </:actions>
 </.header>
 
