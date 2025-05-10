@@ -17,8 +17,6 @@ defmodule AgoraWeb.TopicController do
         |> redirect(to: ~p"/users/log_in")
         |> halt()
 
-        {:error, :unauthorized_not_logged_in}
-
       not current_user.is_moderator ->
         conn
         |> put_flash(:error, "You are not authorized to perform this action.")
